@@ -1,0 +1,8 @@
+{ 
+    "eslint": {
+        "globals": {
+            "Phaser": true,
+            "wx": true
+        }
+    }
+}
