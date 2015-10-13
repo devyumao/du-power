@@ -5,15 +5,23 @@
 
 define(function (require) {
 
-    var NUM_EXTREMUM = 500;
+    var color = require('common/color');
+
+    var NUM_EXTREMUM = 200;
+    var SEGMENT_WIDTH = 10;
+    var SPRITE_INDEX = {
+        tube: 0,
+        current: 1
+    };
 
     /**
      * 地面类
      *
      * @class
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
      */
-    function Terrain(game) {
+    function Terrain(game, options) {
         /**
          * 游戏
          *
@@ -21,11 +29,15 @@ define(function (require) {
          */
         this.game = game;
 
+        this.level = options.level;
+
         this.extremums = [];
 
         this.body = null;
 
         this.edges = []; // FIX: 重命名为曲线
+
+        this.edgePoints = [];
 
         this.spriteGroup = game.add.group();
 
@@ -109,6 +121,7 @@ define(function (require) {
     proto.updateEdges = function () {
         this.clearPrevEdges();
         this.drawNextEdges();
+        this.renderCurrents();
     };
 
     proto.clearPrevEdges = function () {
@@ -117,22 +130,25 @@ define(function (require) {
         var extremums = this.extremums;
         var edges = this.edges;
         var spriteGroup = this.spriteGroup;
-        var boundsLeft = game.camera.x - 400;
+        var zoom = this.level.zoom;
+
         var removeEdge = function (edge) {
             body.removeFixture(edge);
         };
 
+        var destroySprite = function (sprite) {
+            sprite.key.destroy();
+            sprite.destroy();
+        };
+
         for (var prevI = this.nextExtremumIndex; prevI > this.prevExtremumIndex; --prevI) {
+            var boundsLeft = game.camera.x / zoom.scale.x - 400;
             if (extremums[prevI].x < boundsLeft) {
                 edges[prevI].forEach(removeEdge);
                 edges[prevI] = null;
 
-                var sprite = spriteGroup.getAt(prevI);
-                sprite.key.destroy(); // FIX: destroy sprite
-                // if (prevI > 0) {
-                //     spriteGroup.addAt(spriteGroup.getAt(0), prevI);
-                //     sprite.destroy();
-                // }
+                var childGroup = spriteGroup.getAt(prevI);
+                childGroup.forEach(destroySprite);
 
                 this.prevExtremumIndex = prevI;
 
@@ -146,54 +162,158 @@ define(function (require) {
         var body = this.body;
         var extremums = this.extremums;
         var edges = this.edges;
+        var edgePoints = this.edgePoints;
         var spriteGroup = this.spriteGroup;
-        var boundsRight = game.camera.x + 2000;
+        var tubeWidth = 14;
+        var zoom = this.level.zoom;
 
         for (var i = this.nextExtremumIndex; i < NUM_EXTREMUM - 1; ++i) {
             var pointA = extremums[i];
+            var boundsRight = game.camera.x / zoom.scale.x + 2000;
             if (pointA.x > boundsRight) {
                 break;
             }
 
             var pointB = extremums[i + 1];
 
-            var segmentWidth = 10;
-            var segmentCount = Math.floor((pointB.x - pointA.x) / segmentWidth);
+            var segmentCount = Math.floor((pointB.x - pointA.x) / SEGMENT_WIDTH);
             var dx = (pointB.x - pointA.x) / segmentCount;
             var da = Math.PI / segmentCount;
             var ymid = (pointA.y + pointB.y) / 2;
             var ampl = (pointA.y - pointB.y) / 2;
 
-            var p0 = Phaser.Utils.extend(pointA);
+            // var p0 = Phaser.Utils.extend(pointA);
+            var p0 = {x: pointA.x, y: pointA.y};
             var edgeGroup = [];
 
             var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
             var sprite = game.add.sprite(pointA.x, 0, bitmap);
-            spriteGroup.addAt(sprite, i);
+            var childGroup = game.add.group();
+            childGroup.addAt(sprite, SPRITE_INDEX.tube);
+            spriteGroup.addAt(childGroup, i);
 
-            for (var j = 0; j < segmentCount + 1; ++j) {
+            var points = [p0];
+            // var points = [{x: p0.x - sprite.x, y: p0.y}];
+            // var points = [p0];
+
+            var ctx = bitmap.ctx;
+            ctx.beginPath();
+            // ctx.lineJoin = 'miter';
+            ctx.lineCap = 'round';
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = color.get('electric');
+
+            for (var j = 1; j < segmentCount + 1; ++j) {
                 var p1 = {
                     x: pointA.x + j * dx,
                     y: ymid + ampl * Math.cos(da * j)
                 };
 
+                points.push(p1);
                 edgeGroup.push(body.addEdge(p0.x, p0.y, p1.x, p1.y));
 
-                bitmap.line(
-                    p0.x - sprite.x, p0.y,
-                    p1.x - sprite.x, p1.y,
-                    '#fff', 4
-                );
+                var p0xRel = p0.x - sprite.x;
+                var p1xRel = p1.x - sprite.x;
 
-                p0 = Phaser.Utils.extend(p1);
+                ctx.moveTo(p0xRel, p0.y);
+                ctx.lineTo(p1xRel, p1.y);
+
+                var angle = Phaser.Math.angleBetween(p0xRel, p0.y, p1xRel, p1.y);
+                var cos = Math.cos(angle);
+                var sin = Math.sin(angle);
+
+                // TODO: 解决不连续
+                var iy = tubeWidth * cos;
+                var ix = -tubeWidth * sin;
+                ctx.moveTo(p0xRel + ix, p0.y + iy);
+                ctx.lineTo(p1xRel + ix, p1.y + iy);
+
+                p0 = {x: p1.x, y: p1.y};
+
+                // points.push({x: p1xRel, y: p1.y});
             }
 
+            ctx.stroke();
+            ctx.closePath();
+
+            // this.drawCurrents(sprite, points);
+
+            edgePoints[i] = points;
             edges.push(edgeGroup);
         }
 
         if (this.nextExtremumIndex !== i) {
             this.nextExtremumIndex = i;
         }
+    };
+
+    proto.renderCurrents = function () {
+        var game = this.game;
+        var extremums = this.extremums;
+        var spriteGroup = this.spriteGroup;
+        var edgePoints = this.edgePoints;
+        var level = this.level;
+        var zoom = level.zoom;
+
+        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
+            var pointA = extremums[extInd];
+            // if (pointA.x + SEGMENT_WIDTH <= game.camera.x / zoom.scale.x) {
+            //     continue;
+            // }
+            if (pointA.x > game.camera.x / zoom.scale.x + level.power) {
+                break;
+            }
+
+            var pointB = extremums[extInd + 1];
+
+            var childGroup = spriteGroup.getAt(extInd);
+            var sprite = childGroup.getAt(SPRITE_INDEX.current);
+            if (sprite === -1) {
+                var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
+                sprite = game.add.sprite(pointA.x, 0, bitmap);
+                childGroup.addAt(sprite, SPRITE_INDEX.current);
+            }
+            this.drawCurrents(sprite, edgePoints[extInd]);
+        }
+    };
+
+    proto.drawCurrents = function (sprite, points) {
+        var game = this.game;
+        var currentWidth = 8;
+        var bitmap = sprite.key;
+        var ctx = bitmap.ctx;
+        var level = this.level;
+        var zoom = level.zoom;
+
+        bitmap.clear();
+
+        ctx.beginPath();
+        ctx.lineWidth = currentWidth;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = color.get('electric');
+
+        for (var pointInd = 1, len = points.length; pointInd < len; ++pointInd) {
+            var p1 = points[pointInd];
+            if (p1.x > game.camera.x / zoom.scale.x + level.power) {
+                break;
+            }
+            // if (pointInd === 1) {
+            //     bitmap.clear();
+            // }
+            var p0 = points[pointInd - 1];
+
+            var angle = Phaser.Math.angleBetween(p0.x, p0.y, p1.x, p1.y);
+            var cos = Math.cos(angle);
+            var sin = Math.sin(angle);
+
+            var ix = -(currentWidth - 1) * sin;
+            var iy = (currentWidth - 1) * cos;
+            ctx.moveTo(p0.x + ix - sprite.x, p0.y + iy);
+            ctx.lineTo(p1.x + ix - sprite.x, p1.y + iy);
+        }
+
+        ctx.stroke();
+        ctx.closePath();
     };
 
     return Terrain;

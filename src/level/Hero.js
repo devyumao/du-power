@@ -6,7 +6,7 @@
 define(function (require) {
 
     var MIN_Y = 100;
-    var MIN_VELOCITY_X = 60;
+    var MIN_VELOCITY_X = 70;
     var MAX_VELOCITY_X = 1200;
     var MAX_VELOCITY_CACHE = 10;
 
@@ -56,7 +56,7 @@ define(function (require) {
         body.fixedRotation = true;
         this.body = body;
 
-        game.camera.follow(sprite);
+        game.camera.follow(sprite); // TODO: fix follow bug
         game.camera.deadzone = new Phaser.Rectangle(
             100, 60,
             0, 0
@@ -71,7 +71,7 @@ define(function (require) {
      * @public
      */
     proto.wake = function () {
-        this.body.applyForce(100, -200);
+        this.body.applyForce(80, -200);
         this.awake = true;
     };
 

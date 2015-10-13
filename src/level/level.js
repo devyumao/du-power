@@ -13,7 +13,8 @@ define(function (require) {
         terrain: null,
         hero: null,
         zoom: null,
-        isTouching: false
+        isTouching: false,
+        power: null
     };
 
     level.preload = function () {
@@ -28,7 +29,9 @@ define(function (require) {
 
         var game = this.game;
 
-        this.terrain = new Terrain(game);
+        this.power = game.width;
+
+        this.terrain = new Terrain(game, {level: this});
         this.hero = new Hero(game);
 
         this.initZoom();
@@ -47,7 +50,7 @@ define(function (require) {
         var box2d = physics.box2d;
         // box2d.ptmRatio = 60;
         box2d.density = 1;
-        box2d.friction = 0.06;
+        box2d.friction = 0.05;
         box2d.restitution = 0.08;
         box2d.gravity.y = 300;
     };
@@ -86,6 +89,7 @@ define(function (require) {
         this.terrain.update();
         this.hero.update(this.isTouching);
         this.updateZoom();
+        this.updatePower();
     };
 
     // FIX: 单独文件
@@ -100,12 +104,18 @@ define(function (require) {
         deadzone.y = 60 * scale; // FIX: deadzone 参数常量
     };
 
+    level.updatePower = function () {
+        var loss = 1;
+        var newPower = this.power - loss;
+        this.power = newPower > 0 ? newPower : 0;
+    };
+
     level.render = function () {
         var game = this.game;
 
         var debugColor = 'rgba(255, 0, 0, 0.6)';
 
-        game.debug.box2dWorld();
+        // game.debug.box2dWorld();
         game.debug.geom(this.ceiling, debugColor);
         game.debug.geom(this.floor, debugColor);
 
@@ -122,6 +132,9 @@ define(function (require) {
             2, 74,
             '#fff'
         );
+
+        game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
+        game.debug.text('power: ' + this.power.toFixed(1), 2, 114, 'yellow');
     };
 
     return level;

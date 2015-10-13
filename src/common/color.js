@@ -11,7 +11,11 @@ define(function (require) {
      * @type {Object}
      */
     var colors = {
-        'bg': '#000'
+        'bg': '0b0505',
+        'white': '#fff',
+        'electric': '#71bdca',
+        'red': '#ce3c51',
+        'yellow': '#c49b6d'
     };
 
     /**
