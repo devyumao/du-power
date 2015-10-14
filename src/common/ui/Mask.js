@@ -5,7 +5,7 @@
 
 define(function (require) {
 
-    var Easing = require('common/Easing');
+    var color = require('common/color');
 
     /**
      * 遮罩类
@@ -56,8 +56,11 @@ define(function (require) {
     Mask.prototype.init = function () {
         var game = this.game;
 
-        var image = game.add.image(0, 0, 'pixel-black');
-        image.scale.set(game.width / image.width, game.height / image.height);
+        var bitmap = game.add.bitmapData(game.width, game.height);
+        bitmap.rect(0, 0, bitmap.width, bitmap.width, color.get('mask'));
+
+        var image = game.add.image(0, 0, bitmap);
+        image.fixedToCamera = true;
         image.alpha = this.alpha;
         image.inputEnabled = true; // 屏蔽被遮掩层的交互
         this.image = image;
@@ -75,7 +78,7 @@ define(function (require) {
     Mask.prototype.show = function (duration) {
         if (duration) {
             var show = this.game.add.tween(this.image)
-                .from({alpha: 0}, duration, Easing.Quadratic.InOut);
+                .from({alpha: 0}, duration, Phaser.Easing.Quadratic.InOut);
             var promise = new Promise(function (resolve) {
                 show.onComplete.add(resolve);
             });
@@ -97,7 +100,7 @@ define(function (require) {
     Mask.prototype.hide = function (duration) {
         if (duration) {
             var hide = this.game.add.tween(this.image)
-                .to({alpha: 0}, duration, Easing.Quadratic.InOut);
+                .to({alpha: 0}, duration, Phaser.Easing.Quadratic.InOut);
             var me = this;
             var promise = new Promise(function (resolve) {
                 hide.onComplete.add(
@@ -140,7 +143,9 @@ define(function (require) {
      * @private
      */
     Mask.prototype.destroy = function () {
-        this.image.destroy();
+        var image = this.image;
+        image.key.destroy();
+        image.destroy();
     };
 
     return Mask;

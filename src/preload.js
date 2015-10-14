@@ -37,6 +37,11 @@ define(function (require) {
         ['hero', 'start', 'start-ring', 'title', 'title-decoration'].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
+
+        // // 像素图
+        // ['black'].forEach(function (color) {
+        //     game.load.image('pixel-' + color, path + 'pixel/' + color + suffix);
+        // });
     }
 
     /**

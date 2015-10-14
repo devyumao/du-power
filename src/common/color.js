@@ -12,6 +12,8 @@ define(function (require) {
      */
     var colors = {
         'bg': '0b0505',
+        'mask': '#7b7c7c',
+        'black': '#000',
         'white': '#fff',
         'electric': '#71bdca',
         'red': '#ce3c51',

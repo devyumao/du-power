@@ -5,6 +5,7 @@
 
 define(function (require) {
 
+    var Mask = require('common/ui/Mask');
     var Start = require('./Start');
     var Title = require('./Title');
 
@@ -27,7 +28,7 @@ define(function (require) {
 
         this.mask = null;
 
-        this.group = game.add.group();
+        this.group = null;
 
         this.start = null;
 
@@ -47,17 +48,22 @@ define(function (require) {
         var game = this.game;
         var level = this.level;
 
+        this.mask = new Mask(game, {alpha: 0.4});
+
         var start = new Start(game, {level: level});
         this.start = start;
 
         var title = new Title(game);
         this.title = title;
 
-        this.group.addMultiple([start.element, title.element]);
+        var group = game.add.group();
+        group.addMultiple([start.element, title.element]);
+        this.group = group;
     };
 
     proto.destroy = function () {
         this.group.destroy();
+        this.mask.hide(600);
     };
 
     return Menu;

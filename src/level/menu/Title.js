@@ -38,7 +38,8 @@ define(function (require) {
     proto.init = function () {
         var game = this.game;
 
-        var wordart = game.add.image(game.width / 2, game.world.height - game.height + 86, 'title');
+        var wordart = game.add.image(game.width / 2, 86, 'title');
+        wordart.fixedToCamera = true;
         wordart.anchor.set(0.5);
         wordart.scale.set(0.5);
         this.wordart = wordart;

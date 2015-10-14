@@ -187,7 +187,7 @@ define(function (require) {
         var edges = this.edges;
         var edgePoints = this.edgePoints;
         var spriteGroup = this.spriteGroup;
-        var tubeWidth = 14;
+        var tubeWidth = 12;
         var zoom = this.level.zoom;
 
         for (var i = this.nextExtremumIndex; i < NUM_EXTREMUM - 1; ++i) {
@@ -321,7 +321,7 @@ define(function (require) {
 
     proto.drawCurrents = function (sprite, points) {
         var game = this.game;
-        var currentWidth = 8;
+        var currentWidth = 6;
         var bitmap = sprite.key;
         var ctx = bitmap.ctx;
         var level = this.level;
@@ -346,8 +346,8 @@ define(function (require) {
             var cos = Math.cos(angle);
             var sin = Math.sin(angle);
 
-            var ix = -(currentWidth - 1) * sin;
-            var iy = (currentWidth - 1) * cos;
+            var ix = -(currentWidth) * sin;
+            var iy = (currentWidth) * cos;
             ctx.moveTo(p0.x + ix - sprite.x, p0.y + iy);
             ctx.lineTo(p1.x + ix - sprite.x, p1.y + iy);
         }

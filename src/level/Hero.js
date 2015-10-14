@@ -69,8 +69,6 @@ define(function (require) {
         );
 
         this.wake(); // TODO: 延时
-
-        console.log(body);
     };
 
     /**

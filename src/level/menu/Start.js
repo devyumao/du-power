@@ -48,7 +48,7 @@ define(function (require) {
 
         // 绘制按钮
         var button = game.add.button(
-            game.width / 2, game.world.height - game.height / 2,
+            game.width / 2, game.height / 2,
             'start',
             function () {
                 button.inputEnabled = false;
@@ -58,6 +58,7 @@ define(function (require) {
             },
             this
         );
+        button.fixedToCamera = true;
         button.anchor.set(0.5);
         this.button = button;
 
