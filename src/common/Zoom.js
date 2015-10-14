@@ -35,9 +35,9 @@ define(function (require) {
             this.scale.setTo(scale);
         }
         else {
-            // game.add.tween(cameraBounds)
-            //     .to(boundsTo, duration)
-            //     .start();
+            game.add.tween(cameraBounds)
+                .to(boundsTo, duration)
+                .start();
             game.add.tween(this.scale)
                 .to({x: scale, y: scale}, duration)
                 .start();

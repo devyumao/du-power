@@ -34,7 +34,7 @@ define(function (require) {
         var path = 'src/img/';
         var suffix = '.png';
 
-        ['hero'].forEach(function (name) {
+        ['hero', 'start', 'start-ring', 'title', 'title-decoration'].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
     }
@@ -43,7 +43,11 @@ define(function (require) {
      * 创建
      */
     function create() {
-        this.game.state.start('level');
+        var game = this.game;
+        var level = game.state.states.level;
+
+        // menu -> level 是连贯场景，所以实际是同一 state
+        game.state.start('level', true, false, level.STATUS.MENU);
     }
 
     return {

@@ -7,7 +7,7 @@ define(function (require) {
 
     var color = require('common/color');
 
-    var NUM_EXTREMUM = 200;
+    var NUM_EXTREMUM = 50; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -44,6 +44,10 @@ define(function (require) {
         this.prevExtremumIndex = 0;
         this.nextExtremumIndex = 0;
 
+        this.currentColor = color.get('electric');
+
+        this.distance = null;
+
         this.init();
     }
 
@@ -78,28 +82,33 @@ define(function (require) {
      * @private
      */
     proto.initExtremums = function () {
-        var worldHeight = 720; // FIX: config
-        var extremums = this.extremums;
-
-        extremums[0] = {
-            x: 0,
-            y: worldHeight - 240
-        };
-
         var game = this.game;
+        var worldHeight = game.world.height;
 
-        var minDX = 180;
+        // 前三点
+        var extremums = [
+            {x: -60, y: worldHeight - 80},
+            {x: 100, y: worldHeight - 160}, // TODO: config
+            {x: 300, y: worldHeight - 40}
+        ];
+
+        // extremums[0] = {
+        //     x: 0,
+        //     y: worldHeight - 240
+        // };
+
+        var minDX = 190;
         var minDY = 80;
-        var rangeDX = 140;
+        var rangeDX = 130;
         var rangeDY = 120;
         var minHeight = 30;
         var maxHeight = 360;
 
-        for (var i = 1; i < NUM_EXTREMUM; ++i) {
+        for (var i = 3; i <= NUM_EXTREMUM - 2; ++i) {
             var pointA = extremums[i - 1];
 
             var bY;
-            var sign = i % 2 ? 1 : -1;
+            var sign = i % 2 ? -1 : 1;
             do {
                 bY = pointA.y + sign * (minDY + game.rnd.between(0, rangeDY));
             } while (bY > worldHeight - minHeight || bY < worldHeight - maxHeight);
@@ -111,16 +120,30 @@ define(function (require) {
             extremums.push(pointB);
         }
 
-        game.world.setBounds(0, 0, extremums[NUM_EXTREMUM - 1].x, worldHeight);
+        // 倒二
+        var penult = extremums[NUM_EXTREMUM - 2];
+
+        extremums.push({x: penult.x + 500, y: penult.y});
+
+        this.extremums = extremums;
+        this.distance = penult.x;
+
+        game.world.width = extremums[NUM_EXTREMUM - 1].x;
+        // game.world.setBounds(0, 0, extremums[NUM_EXTREMUM - 1].x, worldHeight);
     };
 
     proto.update = function () {
         this.updateEdges();
+        this.updateCurrents();
     };
 
     proto.updateEdges = function () {
         this.clearPrevEdges();
         this.drawNextEdges();
+    };
+
+    proto.updateCurrents = function () {
+        this.updateCurrentColor();
         this.renderCurrents();
     };
 
@@ -193,8 +216,6 @@ define(function (require) {
             spriteGroup.addAt(childGroup, i);
 
             var points = [p0];
-            // var points = [{x: p0.x - sprite.x, y: p0.y}];
-            // var points = [p0];
 
             var ctx = bitmap.ctx;
             ctx.beginPath();
@@ -229,14 +250,10 @@ define(function (require) {
                 ctx.lineTo(p1xRel + ix, p1.y + iy);
 
                 p0 = {x: p1.x, y: p1.y};
-
-                // points.push({x: p1xRel, y: p1.y});
             }
 
             ctx.stroke();
             ctx.closePath();
-
-            // this.drawCurrents(sprite, points);
 
             edgePoints[i] = points;
             edges.push(edgeGroup);
@@ -247,6 +264,27 @@ define(function (require) {
         }
     };
 
+    proto.updateCurrentColor = function () {
+        var power = this.level.power;
+        var POWER_STATUS = power.STATUS;
+
+        // TODO: 充电闪烁效果
+        switch (power.status) {
+            case POWER_STATUS.STABLE:
+            case POWER_STATUS.LOSING:
+                this.currentColor = color.get('electric');
+                break;
+
+            case POWER_STATUS.NORMAL_CHARGE:
+                this.currentColor = color.get('white');
+                break;
+
+            case POWER_STATUS.SUPER_CHARGE:
+                this.currentColor = color.get('yellow');
+                break;
+        }
+    };
+
     proto.renderCurrents = function () {
         var game = this.game;
         var extremums = this.extremums;
@@ -254,19 +292,23 @@ define(function (require) {
         var edgePoints = this.edgePoints;
         var level = this.level;
         var zoom = level.zoom;
+        var power = level.power;
 
         for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
             var pointA = extremums[extInd];
             // if (pointA.x + SEGMENT_WIDTH <= game.camera.x / zoom.scale.x) {
             //     continue;
             // }
-            if (pointA.x > game.camera.x / zoom.scale.x + level.power) {
+            if (pointA.x > game.camera.x / zoom.scale.x + power.value) {
                 break;
             }
 
             var pointB = extremums[extInd + 1];
 
             var childGroup = spriteGroup.getAt(extInd);
+            if (childGroup === -1) {
+                break;
+            }
             var sprite = childGroup.getAt(SPRITE_INDEX.current);
             if (sprite === -1) {
                 var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
@@ -284,22 +326,20 @@ define(function (require) {
         var ctx = bitmap.ctx;
         var level = this.level;
         var zoom = level.zoom;
+        var power = level.power;
 
         bitmap.clear();
 
         ctx.beginPath();
         ctx.lineWidth = currentWidth;
         ctx.lineCap = 'round';
-        ctx.strokeStyle = color.get('electric');
+        ctx.strokeStyle = this.currentColor;
 
         for (var pointInd = 1, len = points.length; pointInd < len; ++pointInd) {
             var p1 = points[pointInd];
-            if (p1.x > game.camera.x / zoom.scale.x + level.power) {
+            if (p1.x > game.camera.x / zoom.scale.x + power.value) {
                 break;
             }
-            // if (pointInd === 1) {
-            //     bitmap.clear();
-            // }
             var p0 = points[pointInd - 1];
 
             var angle = Phaser.Math.angleBetween(p0.x, p0.y, p1.x, p1.y);
@@ -314,6 +354,15 @@ define(function (require) {
 
         ctx.stroke();
         ctx.closePath();
+    };
+
+    proto.getTerminal = function () {
+        var lastPoint = this.extremums[NUM_EXTREMUM - 1];
+
+        return {
+            x: lastPoint.x - 300,
+            y: lastPoint.y
+        };
     };
 
     return Terrain;

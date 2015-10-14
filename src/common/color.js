@@ -15,7 +15,8 @@ define(function (require) {
         'white': '#fff',
         'electric': '#71bdca',
         'red': '#ce3c51',
-        'yellow': '#c49b6d'
+        'yellow': '#c49b6d',
+        'green': 'green'
     };
 
     /**

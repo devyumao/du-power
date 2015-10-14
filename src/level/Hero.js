@@ -15,8 +15,9 @@ define(function (require) {
      *
      * @class
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
      */
-    function Hero(game) {
+    function Hero(game, options) {
         /**
          * 游戏
          *
@@ -24,9 +25,13 @@ define(function (require) {
          */
         this.game = game;
 
+        this.level = options.level;
+
         this.sprite = null;
 
         this.body = null;
+
+        this.radius = 32;
 
         this.awake = false;
 
@@ -45,14 +50,15 @@ define(function (require) {
     proto.init = function () {
         var game = this.game;
 
-        var sprite = game.add.sprite(0, game.world.height - 240 - 32, 'hero');
+        var sprite = game.add.sprite(100, game.world.height - 160 - this.radius, 'hero');
+        sprite.scale.set(0.3);
         sprite.anchor.set(0.5);
         this.sprite = sprite;
 
         game.physics.box2d.enable(sprite);
 
         var body = sprite.body;
-        body.setCircle(32);
+        body.setCircle(this.radius);
         body.fixedRotation = true;
         this.body = body;
 
@@ -63,6 +69,8 @@ define(function (require) {
         );
 
         this.wake(); // TODO: 延时
+
+        console.log(body);
     };
 
     /**
@@ -84,13 +92,17 @@ define(function (require) {
         return this.awake;
     };
 
+    proto.getX = function () {
+        return this.body.x;
+    };
+
     /**
      * 更新
-     *
-     * @param {boolean} isTouching 是否正在触摸
      */
-    proto.update = function (isTouching) {
-        if (isTouching) {
+    proto.update = function () {
+        this.updateStatus();
+
+        if (this.level.isTouching) {
             this.dive();
         }
         this.limitVelocity();
@@ -161,6 +173,39 @@ define(function (require) {
 
         var pMath = Phaser.Math;
         this.body.angle = pMath.radToDeg(pMath.angleBetween(0, 0, avgVelocityX, avgVelocityY));
+    };
+
+    proto.updateStatus = function () {
+        var level = this.level;
+        if (level.progress === 1) {
+            this.awake = false;
+        }
+
+        var power = level.power;
+        var POWER_STATUS = power.STATUS;
+
+        switch (power.status) {
+            case POWER_STATUS.EMPTY:
+                this.awake = false;
+                break;
+        }
+    };
+
+    proto.goToTerminal = function (terminal) {
+        var game = this.game;
+        var posTo = {
+            x: terminal.x,
+            y: terminal.y - this.radius
+        };
+        var duration = 400;
+        var body = this.body;
+
+        game.add.tween(body)
+            .to(posTo, duration)
+            .start();
+        game.add.tween(body)
+            .to({angle: 0}, duration)
+            .start();
     };
 
     proto.render = function () {
