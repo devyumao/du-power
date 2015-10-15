@@ -37,10 +37,10 @@ define(function (require) {
 
         this.lossFreq = 0.5;
 
-        this.normalCharge = 0.5;
+        this.normalCharge = 0.4;
         this.normalThreshold = game.world.height - 460;
 
-        this.superCharge = 1;
+        this.superCharge = 0.8;
         this.superThreshold = game.world.height - 580;
 
         this.status = STATUS.LOSING;

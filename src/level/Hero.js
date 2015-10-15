@@ -6,7 +6,7 @@
 define(function (require) {
 
     var MIN_Y = 100;
-    var MIN_VELOCITY_X = 70;
+    var MIN_VELOCITY_X = 80;
     var MAX_VELOCITY_X = 1200;
     var MAX_VELOCITY_CACHE = 10;
 
@@ -51,7 +51,7 @@ define(function (require) {
         var game = this.game;
 
         var sprite = game.add.sprite(100, game.world.height - 160 - this.radius, 'hero');
-        sprite.scale.set(0.3);
+        sprite.scale.set(0.6);
         sprite.anchor.set(0.5);
         this.sprite = sprite;
 
@@ -120,7 +120,7 @@ define(function (require) {
         var body = this.body;
         var velocity = body.velocity;
         if (velocity.x > MIN_VELOCITY_X) {
-            body.applyForce(0, 80);
+            body.applyForce(0, 70); // TODO: 调参
         }
     };
 

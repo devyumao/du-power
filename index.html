@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>小度能量</title>
+    <title>Fighting SSGer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -10,13 +10,13 @@
     body {
         padding: 0px;
         margin: 0px;
-        background: #0b0505;
+        background: #000;
     }
     </style>
     <script src="dep/esl.js"></script>
     <script src="dep/es6-promise.min.js"></script>
-    <script src="dep/phaser-arcade-physics.js"></script>
-    <script src="dep/box2d-plugin-full.js"></script>
+    <script src="dep/phaser-arcade-physics.min.js"></script>
+    <script src="dep/box2d-plugin-full.min.js"></script>
     <script>
     require.config({
         baseUrl: 'src'
@@ -26,6 +26,8 @@
 <body>
     <script>
     require(['main'], function (main) {
+        var global = require('common/global');
+        global.setDevMode();
         main.init();
     });
     </script>

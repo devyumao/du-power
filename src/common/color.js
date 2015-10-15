@@ -11,13 +11,13 @@ define(function (require) {
      * @type {Object}
      */
     var colors = {
-        'bg': '0b0505',
-        'mask': '#7b7c7c',
+        'bg': '#0a0405',
+        'mask': '#7c7c7c',
         'black': '#000',
         'white': '#fff',
-        'electric': '#71bdca',
-        'red': '#ce3c51',
-        'yellow': '#c49b6d',
+        'electric': '#6ebdcb',
+        'red': '#d0394f',
+        'yellow': '#eec349',
         'green': 'green'
     };
 

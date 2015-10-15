@@ -5,10 +5,14 @@
 
 define(function (require) {
 
+    var global = require('common/global');
+
     /**
      * 初始化
      */
     function init() {
+        global.initResourceConfig();
+
         initGame();
     }
 

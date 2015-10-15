@@ -10,6 +10,8 @@ define(function (require) {
 
     var Menu = require('./menu/Menu');
 
+    var Background = require('./scene/Background');
+
     var Terrain = require('./Terrain');
     var Hero = require('./Hero');
     var Power = require('./Power');
@@ -20,6 +22,10 @@ define(function (require) {
     };
 
     var level = {
+        background: null,
+        midground: null,
+        lightground: null,
+
         terrain: null,
         hero: null,
         zoom: null,
@@ -35,6 +41,8 @@ define(function (require) {
         hasUpdated: false,
 
         progress: 0,
+
+        lastCameraX: 0,
 
         STATUS: STATUS
     };
@@ -102,17 +110,17 @@ define(function (require) {
 
         }
 
-        this.bindTouch();
-
-        var world = this.world;
         // for dev
-        this.ceiling = new Phaser.Rectangle(0, 0, world.width, 40);
-        this.floor = new Phaser.Rectangle(0, world.height - 40, world.width, world.height);
+        // var world = this.world;
+        // this.ceiling = new Phaser.Rectangle(0, 0, world.width, 40);
+        // this.floor = new Phaser.Rectangle(0, world.height - 40, world.width, world.height);
 
         var me = this;
         setTimeout(
             function () {
+                me.bindTouch();
                 me.resume();
+                me.lightground.show(1000);
             },
             0 // for dev
         );
@@ -140,6 +148,38 @@ define(function (require) {
      * 初始化场景
      */
     level.initViews = function () {
+        var game = this.game;
+
+        this.background = new Background(
+            game,
+            {
+                level: this,
+                imageName: 'light-ball',
+                absSpeed: 0.2,
+                relSpeed: 0.1
+            }
+        );
+
+        this.midground = new Background(
+            game,
+            {
+                level: this,
+                imageName: 'midground',
+                absSpeed: 0,
+                relSpeed: 0.5
+            }
+        );
+
+        this.lightground = new Background(
+            game,
+            {
+                level: this,
+                imageName: 'light',
+                absSpeed: 4,
+                relSpeed: 1,
+                alpha: 0
+            }
+        );
     };
 
     /**
@@ -162,10 +202,15 @@ define(function (require) {
      */
     level.initZoom = function () {
         var zoom = new Zoom(this.game);
-        zoom.add(this.hero.sprite);
-        zoom.add(this.terrain.spriteGroup);
+        zoom.addMultiple([
+            this.hero.sprite,
+            this.terrain.spriteGroup
+            // TODO
+            // this.lightground.image
+        ]);
         this.zoom = zoom;
 
+        // // for dev
         // zoom.to(0.7);
         // setTimeout(function () {
         //     zoom.to(1);
@@ -221,6 +266,7 @@ define(function (require) {
                 if (!this.hasUpdated) {
                     this.updateOnce();
                 }
+
                 break;
 
             case STATUS.PLAY:
@@ -232,11 +278,14 @@ define(function (require) {
                 break;
         }
 
+        this.updateView();
+
         this.hasUpdated = true;
     };
 
     level.updateOnce = function () {
         this.updateZoom();
+
         this.power.update();
         this.terrain.update();
         this.hero.update();
@@ -254,6 +303,13 @@ define(function (require) {
         deadzone.y = 60 * scale; // FIX: deadzone 参数常量
     };
 
+    level.updateView = function () {
+        this.background.update();
+        this.midground.update();
+        this.lightground.update();
+        this.lastCameraX = this.game.camera.x / this.zoom.scale.x;
+    };
+
     level.updatePlay = function () {
         var terrain = this.terrain;
         var hero = this.hero;
@@ -261,7 +317,7 @@ define(function (require) {
 
         this.progress = heroX < terrain.distance ? heroX / terrain.distance : 1;
 
-        if (!hero.isAwake() && !this.isOver) {
+        if (this.progress === 1 && !hero.isAwake() && !this.isOver) {
             this.finish(); // 完成
         }
 
@@ -278,6 +334,16 @@ define(function (require) {
     };
 
     level.finish = function () {
+        this.complete();
+
+        this.hero.goToTerminal(this.terrain.getTerminal());
+    };
+
+    level.fail = function () {
+        this.complete();
+    };
+
+    level.complete = function () {
         var game = this.game;
 
         this.isOver = true;
@@ -289,49 +355,46 @@ define(function (require) {
             game.camera.deadzone.y = 60; // TODO: config
         }
 
-        this.hero.goToTerminal(this.terrain.getTerminal());
+        // TODO: 更新电流
+        
+        this.lightground.hide(0);
     };
 
-    level.fail = function () {
-        this.isOver = true;
-        this.pause();
-    };
+    // level.render = function () {
+    //     var game = this.game;
 
-    level.render = function () {
-        var game = this.game;
+    //     game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
 
-        game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
+    //     switch (this.status) {
+    //         case STATUS.MENU:
+    //             break;
 
-        switch (this.status) {
-            case STATUS.MENU:
-                break;
+    //         case STATUS.PLAY:
+    //             var debugColor = 'rgba(255, 0, 0, 0.6)';
 
-            case STATUS.PLAY:
-                var debugColor = 'rgba(255, 0, 0, 0.6)';
+    //             // game.debug.box2dWorld();
+    //             // game.debug.geom(this.ceiling, debugColor);
+    //             // game.debug.geom(this.floor, debugColor);
 
-                // game.debug.box2dWorld();
-                game.debug.geom(this.ceiling, debugColor);
-                game.debug.geom(this.floor, debugColor);
+    //             game.context.fillStyle = debugColor;
+    //             var zone = game.camera.deadzone;
+    //             game.context.fillRect(zone.x, zone.y, zone.width, zone.height);
 
-                game.context.fillStyle = debugColor;
-                var zone = game.camera.deadzone;
-                game.context.fillRect(zone.x, zone.y, zone.width, zone.height);
+    //             this.hero.render();
 
-                this.hero.render();
+    //             game.debug.text(
+    //                 'progress: ' + (this.progress * 100).toFixed(0) + '%',
+    //                 2, 74,
+    //                 '#fff'
+    //             );
 
-                game.debug.text(
-                    'progress: ' + (this.progress * 100).toFixed(0) + '%',
-                    2, 74,
-                    '#fff'
-                );
+    //             game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
 
-                game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
+    //             this.power.render();
 
-                this.power.render();
-
-                break;
-        }
-    };
+    //             break;
+    //     }
+    // };
 
     return level;
 
