@@ -37,9 +37,9 @@ define(function (require) {
          */
         this.imageName = options.imageName;
 
-        this.absSpeed = options.absSpeed ? options.absSpeed : 0;
+        this.absSpeed = options.absSpeed || 0;
 
-        this.relSpeed = options.relSpeed ? options.relSpeed : 0;
+        this.relSpeed = options.relSpeed || 0;
 
         this.alpha = options.alpha !== 'undefined' ? options.alpha : 1;
 

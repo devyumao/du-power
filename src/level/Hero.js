@@ -198,12 +198,19 @@ define(function (require) {
         var duration = 400;
         var body = this.body;
 
-        game.add.tween(body)
-            .to(posTo, duration)
-            .start();
-        game.add.tween(body)
-            .to({angle: 0}, duration)
-            .start();
+        var rotate = game.add.tween(body)
+            .to({angle: 0}, duration);
+
+        var move = game.add.tween(body)
+            .to(posTo, duration);
+        var promise = new Promise(function (resolve) {
+            move.onComplete.add(resolve);
+        });
+
+        rotate.start();
+        move.start();
+
+        return promise;
     };
 
     proto.render = function () {

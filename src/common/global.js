@@ -15,7 +15,11 @@ define(function (require) {
 
         imgPath: null,
         audioPath: null,
-        imgSuffix: null
+        imgSuffix: null,
+
+        signPackage: null,
+
+        fontFamily: '"Helvetica Neue", Helvetica, STHeiTi, sans-serif'
     };
 
     // ==================== mode
@@ -37,19 +41,28 @@ define(function (require) {
 
     // ==================== resource
     global.initResourceConfig = function () {
-        if (global.isProdMode()) {
+        if (this.isProdMode()) {
             // global.imgPath = 'http://ishowshao-game.qiniudn.com/du-power/asset/img/';
-            global.imgPath = 'asset/img/';
-            global.imgSuffix = '.png?v=*TIMESTAMP*';
+            this.imgPath = 'asset/img/';
+            this.imgSuffix = '.png?v=*TIMESTAMP*';
 
-            global.audioPath = 'asset/audio/';
+            this.audioPath = 'asset/audio/';
         }
         else {
-            global.imgPath = 'src/img/';
-            global.imgSuffix = '.png';
+            this.imgPath = 'src/img/';
+            this.imgSuffix = '.png';
 
-            global.audioPath = 'src/audio/';
+            this.audioPath = 'src/audio/';
         }
+    };
+
+    // ==================== sign package
+    global.getSignPackage = function () {
+        return this.signPackage;
+    };
+
+    global.setSignPackage = function (obj) {
+        this.signPackage = obj;
     };
 
     return global;

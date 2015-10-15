@@ -58,7 +58,6 @@ define(function (require) {
             },
             this
         );
-        button.fixedToCamera = true;
         button.anchor.set(0.5);
         this.button = button;
 

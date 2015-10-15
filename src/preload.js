@@ -36,7 +36,13 @@ define(function (require) {
         var path = global.imgPath;
         var suffix = global.imgSuffix;
 
-        ['hero', 'start', 'start-ring', 'title', 'title-decoration'].forEach(function (name) {
+        [
+            'hero',
+            'start', 'start-ring', 'title', 'title-decoration',
+            'icon-back', 'icon-share', 'icon-restart',
+            'success-title', 'ticket',
+            'failure-title', 'progress-ring'
+        ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
 

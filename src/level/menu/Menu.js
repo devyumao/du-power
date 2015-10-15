@@ -10,7 +10,7 @@ define(function (require) {
     var Title = require('./Title');
 
     /**
-     * 开始按钮类
+     * 菜单类
      *
      * @class
      * @param {Phaser.Game} game 游戏
@@ -57,6 +57,7 @@ define(function (require) {
         this.title = title;
 
         var group = game.add.group();
+        group.fixedToCamera = true;
         group.addMultiple([start.element, title.element]);
         this.group = group;
     };

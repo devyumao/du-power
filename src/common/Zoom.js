@@ -31,7 +31,8 @@ define(function (require) {
         };
 
         if (!duration) {
-            Phaser.Utils.mixin(boundsTo, cameraBounds);
+            util.extend(cameraBounds, boundsTo);
+            // Phaser.Utils.mixin(boundsTo, cameraBounds);
             this.scale.setTo(scale);
         }
         else {

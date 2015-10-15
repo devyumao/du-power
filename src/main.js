@@ -13,6 +13,10 @@ define(function (require) {
     function init() {
         global.initResourceConfig();
 
+        if (global.isProdMode()) {
+            require('common/weixin').init();
+        }
+
         initGame();
     }
 

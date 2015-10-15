@@ -6,10 +6,11 @@
 define(function (require) {
 
     /**
-     * 开始按钮类
+     * 标题类
      *
      * @class
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
      */
     function Title(game, options) {
         /**
@@ -39,7 +40,6 @@ define(function (require) {
         var game = this.game;
 
         var wordart = game.add.image(game.width / 2, 86, 'title');
-        wordart.fixedToCamera = true;
         wordart.anchor.set(0.5);
         wordart.scale.set(0.5);
         this.wordart = wordart;
