@@ -40,7 +40,7 @@ define(function (require) {
 
     proto.initGroup = function () {
         this.group = this.game.add.group();
-        this.addTip('charge');
+        // this.addTip('charge');
     };
 
     proto.addTip = function (name) {

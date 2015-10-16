@@ -50,6 +50,10 @@ define(function (require) {
 
         this.currentColor = color.get('electric');
 
+        this.cAlpha = 1;
+
+        this.cAlphaDeltaSign = -1;
+
         this.distance = null;
 
         this.init();
@@ -329,6 +333,15 @@ define(function (require) {
         var zoom = level.zoom;
         var power = level.power;
 
+        if (this.cAlpha >= 1) {
+            this.cAlphaDeltaSign = -1;
+        }
+        else if (this.cAlpha <= 0.5) {
+            this.cAlphaDeltaSign = 1;
+        }
+
+        this.cAlpha += this.cAlphaDeltaSign * 0.02;
+
         for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
             var pointA = extremums[extInd];
             // if (pointA.x + SEGMENT_WIDTH <= game.camera.x / zoom.scale.x) {
@@ -349,6 +362,11 @@ define(function (require) {
                 var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
                 sprite = game.add.sprite(pointA.x, 0, bitmap);
                 childGroup.addAt(sprite, SPRITE_INDEX.current);
+
+                // var lastSprite = childGroup.getAt(SPRITE_INDEX.current - 1);
+                // var lastAlpha = lastSprite === -1 ? 0.5 : lastSprite.alpha
+                // game.add.tween(sprite)
+                //     .to({alpha: lastAlpha}, 200, Phaser.Easing.Linear.None, true, 0, -1, true);
             }
             this.drawCurrents(sprite, edgePoints[extInd]);
         }
@@ -362,6 +380,8 @@ define(function (require) {
         var level = this.level;
         var zoom = level.zoom;
         var power = level.power;
+
+        sprite.alpha = this.cAlpha;
 
         bitmap.clear();
 
