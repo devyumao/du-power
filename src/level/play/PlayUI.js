@@ -7,6 +7,7 @@ define(function (require) {
 
     var Roadmap = require('./Roadmap');
     var Pause = require('./Pause');
+    var ChargeTip = require('./ChargeTip');
 
     /**
      * 可玩界面类
@@ -31,6 +32,8 @@ define(function (require) {
 
         this.pause = null;
 
+        this.chargeTip = null;
+
         this.init();
     }
 
@@ -51,14 +54,22 @@ define(function (require) {
         var pause = new Pause(game, {level: level});
         this.pause = pause;
 
+        var chargeTip = new ChargeTip(game, {level: level});
+        this.chargeTip = chargeTip;
+
         var group = game.add.group();
         group.fixedToCamera = true;
-        group.addMultiple([roadmap.element, pause.group]);
+        group.addMultiple([
+            roadmap.element,
+            pause.group,
+            chargeTip.group
+        ]);
         this.group = group;
     };
 
     proto.update = function () {
         this.roadmap.update();
+        this.chargeTip.update();
     };
 
     proto.destroy = function () {

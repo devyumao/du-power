@@ -45,6 +45,8 @@ define(function (require) {
 
         this.status = STATUS.LOSING;
 
+        this.lastStatus = this.status;
+
         // this.init();
     }
 
@@ -56,6 +58,8 @@ define(function (require) {
         var level = this.level;
         var heroBody = level.hero.body;
         var newValue;
+
+        this.lastStatus = this.status;
 
         if (heroBody.y <= this.superThreshold) {
             newValue = this.value + this.normalCharge;

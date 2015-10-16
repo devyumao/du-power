@@ -43,7 +43,8 @@ define(function (require) {
             'success-title', 'ticket',
             'failure-title', 'progress-ring',
             'hero-label',
-            'button-pause', 'button-close'
+            'button-pause', 'button-close',
+            'charge', 'charge-double'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });

@@ -7,7 +7,7 @@ define(function (require) {
 
     var color = require('common/color');
 
-    var NUM_EXTREMUM = 10; // 偶数为佳
+    var NUM_EXTREMUM = 50; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -311,7 +311,7 @@ define(function (require) {
                 break;
 
             case POWER_STATUS.NORMAL_CHARGE:
-                this.currentColor = color.get('white');
+                this.currentColor = color.get('green');
                 break;
 
             case POWER_STATUS.SUPER_CHARGE:

@@ -18,7 +18,7 @@ define(function (require) {
         'electric': '#6ebdcb',
         'red': '#d0394f',
         'yellow': '#eec349',
-        'green': '#72bc4b',
+        'green': '#8dc662',
         'jujube': '#6b3e3e'
     };
 

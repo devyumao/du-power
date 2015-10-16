@@ -41,7 +41,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        // this.status = STATUS.PLAY; // for dev
+        this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -95,8 +95,8 @@ define(function (require) {
                 break;
         }
 
-        var mask = new Mask(this.game, {color: color.get('black'), alpha: 1});
-        mask.hide(150); // 会自动销毁
+        // var mask = new Mask(this.game, {color: color.get('black'), alpha: 1});
+        // mask.hide(150); // 会自动销毁
 
         // for dev
     };
@@ -366,14 +366,24 @@ define(function (require) {
 
         this.hero.goToTerminal(this.terrain.getTerminal())
             .then(function () {
-                me.successEnd = new SuccessEnd(me.game);
+                setTimeout(
+                    function () {
+                        me.successEnd = new SuccessEnd(me.game);
+                    },
+                    400
+                );
             });
     };
 
     level.fail = function () {
         this.complete();
 
-        this.failureEnd = new FailureEnd(this.game, {progress: this.progress});
+        setTimeout(
+            function () {
+                this.failureEnd = new FailureEnd(this.game, {progress: this.progress});
+            },
+            400
+        );
     };
 
     level.complete = function () {
