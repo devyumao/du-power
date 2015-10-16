@@ -41,7 +41,9 @@ define(function (require) {
             'start', 'start-ring', 'title', 'title-decoration',
             'icon-back', 'icon-share', 'icon-restart',
             'success-title', 'ticket',
-            'failure-title', 'progress-ring'
+            'failure-title', 'progress-ring',
+            'hero-label',
+            'button-pause', 'button-close'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
@@ -49,6 +51,8 @@ define(function (require) {
         game.load.spritesheet('midground', path + 'midground' + suffix, 800, 272);
         game.load.spritesheet('light-ball', path + 'light-ball' + suffix, 1600, 480);
         game.load.spritesheet('light', path + 'light' + suffix, 1400, 720);
+
+        game.load.spritesheet('flag', path + 'flag' + suffix, 186, 197);
 
         // // 像素图
         // ['black'].forEach(function (color) {

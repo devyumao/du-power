@@ -7,7 +7,7 @@ define(function (require) {
 
     var color = require('common/color');
 
-    var NUM_EXTREMUM = 6; // 偶数为佳
+    var NUM_EXTREMUM = 10; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -41,6 +41,10 @@ define(function (require) {
 
         this.spriteGroup = game.add.group();
 
+        this.flag = null;
+
+        this.hasFlag = false;
+
         this.prevExtremumIndex = 0;
         this.nextExtremumIndex = 0;
 
@@ -61,6 +65,19 @@ define(function (require) {
     proto.init = function () {
         this.initExtremums();
         this.initBody();
+        // this.initFlag();
+    };
+
+    proto.initFlag = function () {
+        var Flag = require('./scene/Flag');
+        var game = this.game;
+        var penult = this.extremums[NUM_EXTREMUM - 2];
+
+        this.flag = new Flag(
+            game,
+            {x: game.world.width - 70, y: penult.y}
+        );
+        this.hasFlag = true;
     };
 
     /**
@@ -126,6 +143,7 @@ define(function (require) {
         extremums.push({x: penult.x + 500, y: penult.y});
 
         this.extremums = extremums;
+        // TODO: 路程去前
         this.distance = penult.x;
 
         game.world.width = extremums[NUM_EXTREMUM - 1].x;
@@ -135,6 +153,23 @@ define(function (require) {
     proto.update = function () {
         this.updateEdges();
         this.updateCurrents();
+        this.updateFlag();
+    };
+
+    proto.updateFlag = function () {
+        if (this.hasFlag) {
+            return;
+        }
+
+        var game = this.game;
+        var boundsLeft = this.getPenult().x - 600;
+        if (game.camera.x / this.level.zoom.scale.x > boundsLeft) {
+            this.initFlag();
+        }
+    };
+
+    proto.getPenult = function () {
+        return this.extremums[NUM_EXTREMUM - 2];
     };
 
     proto.updateEdges = function () {

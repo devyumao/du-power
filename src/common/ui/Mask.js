@@ -31,19 +31,21 @@ define(function (require) {
          */
         this.image = null;
 
+        this.color = options.color || color.get('mask');
+
         /**
          * 透明度
          *
          * @type {number}
          */
-        this.alpha = options.alpha ? options.alpha : 1;
+        this.alpha = options.alpha || 1;
 
         /**
          * 触摸回调
          *
          * @type {?Function}
          */
-        this.onTouch = options.onTouch ? options.onTouch : null;
+        this.onTouch = options.onTouch || null;
 
         this.init();
     }
@@ -57,7 +59,7 @@ define(function (require) {
         var game = this.game;
 
         var bitmap = game.add.bitmapData(game.width, game.height);
-        bitmap.rect(0, 0, bitmap.width, bitmap.width, color.get('mask'));
+        bitmap.rect(0, 0, bitmap.width, bitmap.width, this.color);
 
         var image = game.add.image(0, 0, bitmap);
         image.fixedToCamera = true;

@@ -5,7 +5,9 @@
 
 define(function (require) {
 
+    var color = require('common/color');
     var util = require('common/util');
+    var Mask = require('common/ui/Mask');
 
     /**
      * 按钮组类
@@ -43,12 +45,24 @@ define(function (require) {
         group.y = game.height - 50;
         this.group = group;
 
+        var transition = function () {
+            // 用遮掩层过渡
+            var mask = new Mask(game, {color: color.get('black'), alpha: 1});
+            return mask.show(150); // 会自动销毁
+        };
+
+        var LEVEL_STATUS = game.state.states.level.STATUS;
+
         // TODO: 素材留白 保证点击
         var btnConfigList = [
             {
                 name: 'icon-back',
                 scale: 0.7,
                 onClick: function () {
+                    transition()
+                        .then(function () {
+                            game.state.restart(true, false, LEVEL_STATUS.MENU);
+                        });
                 }
             },
             {
@@ -61,6 +75,10 @@ define(function (require) {
                 name: 'icon-restart',
                 scale: 0.7,
                 onClick: function () {
+                    transition()
+                        .then(function () {
+                            game.state.restart(true, false, LEVEL_STATUS.PLAY);
+                        });
                 }
             }
         ];

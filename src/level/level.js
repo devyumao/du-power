@@ -6,10 +6,14 @@
 define(function (require) {
 
     // var global = require('common/global');
+    var color = require('common/color');
     var util = require('common/util');
+
+    var Mask = require('common/ui/Mask');
     var Zoom = require('common/Zoom');
 
     var Menu = require('./menu/Menu');
+    var PlayUI = require('./play/PlayUI');
     var SuccessEnd = require('./end/SuccessEnd');
     var FailureEnd = require('./end/FailureEnd');
 
@@ -37,7 +41,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        this.status = STATUS.PLAY; // for dev
+        // this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -91,8 +95,10 @@ define(function (require) {
                 break;
         }
 
+        var mask = new Mask(this.game, {color: color.get('black'), alpha: 1});
+        mask.hide(150); // 会自动销毁
+
         // for dev
-        // this.successEnd = new SuccessEnd(this.game);
     };
 
     /**
@@ -134,6 +140,7 @@ define(function (require) {
         setTimeout(
             function () {
                 me.bindTouch();
+                me.playUI = new PlayUI(me.game, {level: me});
                 me.resume();
                 me.lightground.show(1000);
             },
@@ -290,6 +297,7 @@ define(function (require) {
                 }
                 this.updateOnce();
                 this.updatePlay();
+
                 break;
         }
 
@@ -332,8 +340,11 @@ define(function (require) {
 
         this.progress = heroX < terrain.distance ? heroX / terrain.distance : 1;
 
+        this.playUI.update();
+
         if (this.progress === 1 && !hero.isAwake() && !this.isOver) {
             this.finish(); // 完成
+            return;
         }
 
         var power = this.power;
@@ -362,7 +373,7 @@ define(function (require) {
     level.fail = function () {
         this.complete();
 
-        this.failureEnd = new FailureEnd(this.game, {progress: this.progress.toFixed(2)});
+        this.failureEnd = new FailureEnd(this.game, {progress: this.progress});
     };
 
     level.complete = function () {
@@ -376,6 +387,8 @@ define(function (require) {
             zoom.to(1, 200);
             game.camera.deadzone.y = 60; // TODO: config
         }
+
+        this.playUI.destroy();
 
         // TODO: 更新电流
 
