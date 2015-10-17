@@ -213,7 +213,7 @@ define(function (require) {
         var box2d = physics.box2d;
         // box2d.ptmRatio = 60;
         box2d.density = 1;
-        box2d.friction = 0.05;
+        box2d.friction = 0.03;
         box2d.restitution = 0.08;
         box2d.gravity.y = 300;
     };

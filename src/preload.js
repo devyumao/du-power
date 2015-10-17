@@ -44,7 +44,8 @@ define(function (require) {
             'failure-title', 'progress-ring',
             'hero-label',
             'button-pause', 'button-close',
-            'charge', 'charge-double'
+            'charge', 'charge-double',
+            'light-fly'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });

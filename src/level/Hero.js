@@ -31,6 +31,8 @@ define(function (require) {
 
         this.body = null;
 
+        this.light = null;
+
         this.radius = 32;
 
         this.awake = false;
@@ -41,7 +43,7 @@ define(function (require) {
 
         this.isContactEnding = false;
 
-        // this.isFlying = false;
+        this.isFlying = false;
 
         this.init();
     }
@@ -54,12 +56,28 @@ define(function (require) {
      * @private
      */
     proto.init = function () {
+        this.initSprite();
+        this.initBody();
+        this.initLight();
+        this.configCamera();
+
+        this.sleep();
+
+        this.wake(); // TODO: 延时
+    };
+
+    proto.initSprite = function () {
         var game = this.game;
 
         var sprite = game.add.sprite(100, game.world.height - 160 - this.radius);
         sprite.scale.set(0.6);
         sprite.anchor.set(0.5);
         this.sprite = sprite;
+    };
+
+    proto.initBody = function () {
+        var game = this.game;
+        var sprite = this.sprite;
 
         game.physics.box2d.enable(sprite);
 
@@ -76,16 +94,38 @@ define(function (require) {
             },
             this
         );
+    };
 
-        game.camera.follow(sprite); // TODO: fix follow bug
+    proto.configCamera = function () {
+        var game = this.game;
+        game.camera.follow(this.sprite); // TODO: fix follow bug
         game.camera.deadzone = new Phaser.Rectangle(
             100, 60,
             0, 0
         );
+    };
 
-        this.sleep();
+    proto.initLight = function () {
+        var game = this.game;
 
-        this.wake(); // TODO: 延时
+        var light = game.add.image(-60, -10, 'light-fly');
+        light.anchor.set(1, 0.5);
+        light.alpha = 0;
+        this.light = light;
+
+        this.sprite.addChild(light);
+    };
+
+    proto.showLight = function () {
+        var game = this.game;
+        var light = this.light;
+        var Easing = Phaser.Easing;
+
+        var fadeIn = game.add.tween(light)
+            .to({alpha: 1}, 150, Easing.Quadratic.Out);
+        var fadeOut = game.add.tween(light)
+            .to({alpha: 0}, 300, Easing.Quadratic.In, false, 300);
+        fadeIn.chain(fadeOut).start();
     };
 
     /**
@@ -189,15 +229,11 @@ define(function (require) {
         }
         else {
             this.flyingFrameCount = 0;
+            this.isFlying = false;
         }
 
         this.sprite.bringToTop(); // XXX: 可能有性能问题
-
         this.updateStatus();
-
-        if (this.level.isTouching) {
-            this.dive();
-        }
         this.limitVelocity();
         this.updateAngle();
     };
@@ -261,14 +297,23 @@ define(function (require) {
             case POWER_STATUS.EMPTY:
                 this.awake = false;
                 break;
+
             default:
-                var angle = this.body.angle;
+                var body = this.body;
+                var angle = body.angle;
                 if (level.isTouching) {
+                    this.dive();
                 }
                 else {
                     if (angle < 0) {
                         if (this.flyingFrameCount >= 10) {
+                            var velocity = body.velocity;
+                            if (!this.isFlying && velocity.y < 0) {
+                                var speed = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
+                                speed >= 350 && this.showLight();
+                            }
                             this.fly();
+                            this.isFlying = true;
                         }
                         else {
                             this.up();
