@@ -136,12 +136,12 @@ define(function (require) {
      * @param {number} fps 帧数
      * @param {boolean=} loop 是否循环, 缺省 false
      */
-    proto.act = function (action, fps, loop) {
+    proto.act = function (action, fps, loop, refresh) {
         var sprite = this.sprite;
         var key = ['hero', action].join('-');
 
         // 若已是当前 key, 则不重载贴图 (loadTexture 较耗内存)
-        if (sprite.key === key) {
+        if (sprite.key === key && !refresh) {
             return;
         }
         sprite.loadTexture(key);
@@ -186,10 +186,18 @@ define(function (require) {
      * @public
      */
     proto.wake = function () {
-        this.act('wake', 5);
+        var timeEvents = this.game.time.events;
 
         this.game.time.events.add(
-            1000,
+            200,
+            function () {
+                this.act('wake', 5);
+            },
+            this
+        );
+
+        this.game.time.events.add(
+            1300,
             function () {
                 this.body.applyForce(200, -200);
                 this.awake = true;
@@ -210,6 +218,14 @@ define(function (require) {
             body.applyForce(0, 70); // TODO: 调参
         }
         this.act('dive');
+    };
+
+    proto.shutdown = function () {
+        this.act('over');
+    };
+
+    proto.over = function () {
+        this.act('over', 10, false, true);
     };
 
     /**
@@ -360,6 +376,8 @@ define(function (require) {
     };
 
     proto.goToTerminal = function (terrain) {
+        this.shutdown();
+
         var terminal = terrain.getTerminal();
         terminal.y -= this.radius;
 
@@ -367,6 +385,8 @@ define(function (require) {
     };
 
     proto.fall = function (terrain) {
+        this.shutdonw();
+
         var position = terrain.getNearestPoint(this);
         position.y -= this.radius;
         var duration = Math.abs(this.body.y - position.y);

@@ -295,6 +295,7 @@ define(function (require) {
      */
     level.update = function () {
         switch (this.status) {
+            case STATUS.OVER:
             case STATUS.MENU:
                 // if (!this.hasUpdated) {
                 //     this.updateOnce();
@@ -379,13 +380,18 @@ define(function (require) {
         this.complete();
 
         var me = this;
-        this.hero.goToTerminal(this.terrain)
+        var hero = this.hero;
+
+        hero.goToTerminal(this.terrain)
             .then(function () {
-                setTimeout(
+                hero.over();
+
+                me.game.time.events.add(
+                    500,
                     function () {
-                        me.successEnd = new SuccessEnd(me.game);
+                        this.successEnd = new SuccessEnd(this.game);
                     },
-                    400
+                    me
                 );
             });
     };
@@ -394,13 +400,18 @@ define(function (require) {
         this.complete();
 
         var me = this;
-        this.hero.fall(this.terrain)
+        var hero = this.hero;
+
+        hero.fall(this.terrain)
             .then(function () {
-                setTimeout(
+                hero.over();
+
+                me.game.time.events.add(
+                    500,
                     function () {
-                        me.failureEnd = new FailureEnd(me.game, {progress: me.progress});
+                        this.failureEnd = new FailureEnd(this.game, {progress: this.progress});
                     },
-                    400
+                    me
                 );
             });
     };

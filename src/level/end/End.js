@@ -5,6 +5,7 @@
 
 define(function (require) {
 
+    var color = require('common/color');
     var Mask = require('common/ui/Mask');
     var BtnGroup = require('./BtnGroup');
 
@@ -42,7 +43,9 @@ define(function (require) {
     proto.init = function () {
         var game = this.game;
 
-        this.mask = new Mask(game, {alpha: 0.6});
+        var mask = new Mask(game, {alpha: 0.5, color: color.get('black')});
+        mask.show(500);
+        this.mask = mask;
 
         var title = game.add.image(game.width / 2, 37, this.titleImageName);
         title.anchor.set(0.5, 0);
@@ -60,9 +63,17 @@ define(function (require) {
             btnGroup.group
         ]);
         this.group = group;
+
+        this.show();
     };
 
     proto.initContent = function () {
+    };
+
+    proto.show = function () {
+        this.game.add.tween(this.group)
+            .from({alpha: 0}, 500, Phaser.Easing.Quadratic.InOut)
+            .start();
     };
 
     return End;
