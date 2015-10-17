@@ -37,6 +37,12 @@ define(function (require) {
 
         this.velocityCache = [];
 
+        this.flyingFrameCount = 0;
+
+        this.isContactEnding = false;
+
+        // this.isFlying = false;
+
         this.init();
     }
 
@@ -50,7 +56,7 @@ define(function (require) {
     proto.init = function () {
         var game = this.game;
 
-        var sprite = game.add.sprite(100, game.world.height - 160 - this.radius, 'hero');
+        var sprite = game.add.sprite(100, game.world.height - 160 - this.radius);
         sprite.scale.set(0.6);
         sprite.anchor.set(0.5);
         this.sprite = sprite;
@@ -62,13 +68,89 @@ define(function (require) {
         body.fixedRotation = true;
         this.body = body;
 
+        // 碰撞检测
+        body.setBodyContactCallback(
+            this.level.terrain,
+            function (heroBody, terrainBody, heroFt, terrainFt, begin) {
+                this.isContactEnding = !begin;
+            },
+            this
+        );
+
         game.camera.follow(sprite); // TODO: fix follow bug
         game.camera.deadzone = new Phaser.Rectangle(
             100, 60,
             0, 0
         );
 
+        this.sleep();
+
         this.wake(); // TODO: 延时
+    };
+
+    /**
+     * 行使动作
+     *
+     * @private
+     * @param {string} action 动作名称
+     * @param {number} fps 帧数
+     * @param {boolean=} loop 是否循环, 缺省 false
+     */
+    proto.act = function (action, fps, loop) {
+        var sprite = this.sprite;
+        var key = ['hero', action].join('-');
+
+        // 若已是当前 key, 则不重载贴图 (loadTexture 较耗内存)
+        if (sprite.key === key) {
+            return;
+        }
+        sprite.loadTexture(key);
+
+        // 添加/运行动画
+        if (fps) {
+            !sprite.animations.getAnimation(action) && sprite.animations.add(action, null, fps, !!loop);
+            sprite.animations.play(action);
+        }
+    };
+
+    proto.pauseAct = function () {
+        var currentAnim = this.sprite.animations.currentAnim;
+        currentAnim.stop();
+    };
+
+    proto.resumeAct = function () {
+        var currentAnim = this.sprite.animations.currentAnim;
+        currentAnim.play();
+    };
+
+    proto.sleep = function () {
+        this.act('sleep', 6, true);
+    };
+
+    proto.up = function () {
+        this.act('up', 6, true);
+    };
+
+    proto.fly = function () {
+        this.act('fly');
+    };
+
+    proto.down = function () {
+        this.act('down');
+    };
+
+    /**
+     * 俯冲
+     *
+     * @public
+     */
+    proto.dive = function () {
+        var body = this.body;
+        var velocity = body.velocity;
+        if (velocity.x > MIN_VELOCITY_X) {
+            body.applyForce(0, 70); // TODO: 调参
+        }
+        this.act('dive');
     };
 
     /**
@@ -98,6 +180,19 @@ define(function (require) {
      * 更新
      */
     proto.update = function () {
+        if (!this.awake) {
+            return;
+        }
+
+        if (this.isContactEnding) {
+            ++this.flyingFrameCount;
+        }
+        else {
+            this.flyingFrameCount = 0;
+        }
+
+        this.sprite.bringToTop(); // XXX: 可能有性能问题
+
         this.updateStatus();
 
         if (this.level.isTouching) {
@@ -108,30 +203,9 @@ define(function (require) {
     };
 
     /**
-     * 俯冲
-     *
-     * @public
-     */
-    proto.dive = function () {
-        if (!this.awake) {
-            return;
-        }
-
-        var body = this.body;
-        var velocity = body.velocity;
-        if (velocity.x > MIN_VELOCITY_X) {
-            body.applyForce(0, 70); // TODO: 调参
-        }
-    };
-
-    /**
      * 限制速度
      */
     proto.limitVelocity = function () {
-        if (!this.awake) {
-            return;
-        }
-
         var body = this.body;
         var velocity = body.velocity;
         if (velocity.x < MIN_VELOCITY_X) {
@@ -176,7 +250,8 @@ define(function (require) {
     proto.updateStatus = function () {
         var level = this.level;
         if (level.progress === 1) {
-            this.awake = false;
+            this.awake = false; // TODO: sleep()
+            return;
         }
 
         var power = level.power;
@@ -186,6 +261,23 @@ define(function (require) {
             case POWER_STATUS.EMPTY:
                 this.awake = false;
                 break;
+            default:
+                var angle = this.body.angle;
+                if (level.isTouching) {
+                }
+                else {
+                    if (angle < 0) {
+                        if (this.flyingFrameCount >= 10) {
+                            this.fly();
+                        }
+                        else {
+                            this.up();
+                        }
+                    }
+                    else if (angle > 0) {
+                        this.down();
+                    }
+                }
         }
     };
 

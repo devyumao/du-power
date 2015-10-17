@@ -41,7 +41,7 @@ define(function (require) {
 
         var progressText = game.add.text(
             10, 121,
-            (this.progress * 100).toFixed(0) + '',
+            Math.floor(this.progress * 100) + '',
             {
                 font: '48px ' + global.fontFamily,
                 fill: color.get('green')

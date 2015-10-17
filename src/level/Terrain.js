@@ -7,7 +7,7 @@ define(function (require) {
 
     var color = require('common/color');
 
-    var NUM_EXTREMUM = 50; // 偶数为佳
+    var NUM_EXTREMUM = 500; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -339,7 +339,6 @@ define(function (require) {
         else if (this.cAlpha <= 0.5) {
             this.cAlphaDeltaSign = 1;
         }
-
         this.cAlpha += this.cAlphaDeltaSign * 0.02;
 
         for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {

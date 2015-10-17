@@ -38,7 +38,7 @@ define(function (require) {
         this.lossFreq = 0.5;
 
         this.normalCharge = 0.4;
-        this.normalThreshold = game.world.height - 460;
+        this.normalThreshold = game.world.height - 450;
 
         this.superCharge = 0.8;
         this.superThreshold = game.world.height - 580;
@@ -60,6 +60,11 @@ define(function (require) {
         var newValue;
 
         this.lastStatus = this.status;
+
+        if (level.status !== level.STATUS.PLAY) {
+            this.status = STATUS.STABLE;
+            return;
+        }
 
         if (heroBody.y <= this.superThreshold) {
             newValue = this.value + this.normalCharge;

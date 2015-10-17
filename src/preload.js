@@ -49,6 +49,16 @@ define(function (require) {
             game.load.image(name, path + name + suffix);
         });
 
+        [
+            'hero-sleep',
+            'hero-up',
+            'hero-fly',
+            'hero-down',
+            'hero-dive'
+        ].forEach(function (name) {
+            game.load.spritesheet(name, path + name + suffix, 120, 212);
+        });
+
         game.load.spritesheet('midground', path + 'midground' + suffix, 800, 272);
         game.load.spritesheet('light-ball', path + 'light-ball' + suffix, 1600, 480);
         game.load.spritesheet('light', path + 'light' + suffix, 1400, 720);

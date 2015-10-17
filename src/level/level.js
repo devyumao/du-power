@@ -25,7 +25,8 @@ define(function (require) {
 
     var STATUS = {
         MENU: 0,
-        PLAY: 1
+        PLAY: 1,
+        OVER: 2
     };
 
     var level = {
@@ -41,7 +42,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        this.status = STATUS.PLAY; // for dev
+        // this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -62,7 +63,6 @@ define(function (require) {
 
             status: null,
 
-            isOver: false,
             isTouching: false,
             isPaused: false,
             hasUpdated: false,
@@ -107,8 +107,10 @@ define(function (require) {
     level.initMenuStatus = function () {
         this.initBaseObjects();
 
-        var game = this.game;
+        // this.pause();
+        this.physics.box2d.pause();
 
+        var game = this.game;
         this.menuUI = new Menu(game, {level: this});
     };
 
@@ -119,14 +121,11 @@ define(function (require) {
         switch (this.status) {
             case STATUS.MENU:
                 this.menuUI.destroy();
-
                 this.status = STATUS.PLAY;
-
                 break;
 
             case STATUS.PLAY:
                 this.initBaseObjects();
-
                 break;
 
         }
@@ -136,16 +135,18 @@ define(function (require) {
         // this.ceiling = new Phaser.Rectangle(0, 0, world.width, 40);
         // this.floor = new Phaser.Rectangle(0, world.height - 40, world.width, world.height);
 
-        var me = this;
-        setTimeout(
-            function () {
-                me.bindTouch();
-                me.playUI = new PlayUI(me.game, {level: me});
-                me.resume();
-                me.lightground.show(1000);
-            },
-            0 // for dev
-        );
+        // var me = this;
+        // setTimeout(
+        //     function () {
+        //     },
+        //     0 // for dev
+        // );
+
+        this.physics.box2d.resume();
+
+        this.bindTouch();
+        this.playUI = new PlayUI(this.game, {level: this});
+        this.lightground.show(1000);
     };
 
     /**
@@ -162,8 +163,6 @@ define(function (require) {
         this.hero = new Hero(game, {level: this});
 
         this.initZoom();
-
-        this.pause();
     };
 
     /**
@@ -272,11 +271,21 @@ define(function (require) {
     level.pause = function () {
         this.isPaused = true;
         this.physics.box2d.pause();
+        this.pauseAnimations();
+    };
+
+    level.pauseAnimations = function () {
+        this.hero.pauseAct();
     };
 
     level.resume = function () {
         this.isPaused = false;
         this.physics.box2d.resume();
+        this.resumeAnimations();
+    };
+
+    level.resumeAnimations = function () {
+        this.hero.resumeAct();
     };
 
     /**
@@ -285,9 +294,11 @@ define(function (require) {
     level.update = function () {
         switch (this.status) {
             case STATUS.MENU:
-                if (!this.hasUpdated) {
-                    this.updateOnce();
-                }
+                // if (!this.hasUpdated) {
+                //     this.updateOnce();
+                // }
+                this.updateOnce();
+                this.updateView();
 
                 break;
 
@@ -296,12 +307,11 @@ define(function (require) {
                     return;
                 }
                 this.updateOnce();
+                this.updateView();
                 this.updatePlay();
 
                 break;
         }
-
-        this.updateView();
 
         this.hasUpdated = true;
     };
@@ -342,7 +352,7 @@ define(function (require) {
 
         this.playUI.update();
 
-        if (this.progress === 1 && !hero.isAwake() && !this.isOver) {
+        if (this.progress === 1 && !hero.isAwake() && !this.isOver()) {
             this.finish(); // 完成
             return;
         }
@@ -352,11 +362,15 @@ define(function (require) {
 
         switch (power.status) {
             case POWER_STATUS.EMPTY:
-                if (!hero.isAwake() && !this.isOver) {
+                if (!hero.isAwake() && !this.isOver()) {
                     this.fail(); // 失败
                 }
                 break;
         }
+    };
+
+    level.isOver = function () {
+        return this.status === STATUS.OVER;
     };
 
     level.finish = function () {
@@ -378,9 +392,11 @@ define(function (require) {
     level.fail = function () {
         this.complete();
 
+        var me = this;
+
         setTimeout(
             function () {
-                this.failureEnd = new FailureEnd(this.game, {progress: this.progress});
+                me.failureEnd = new FailureEnd(me.game, {progress: me.progress});
             },
             400
         );
@@ -389,8 +405,8 @@ define(function (require) {
     level.complete = function () {
         var game = this.game;
 
-        this.isOver = true;
-        this.pause();
+        this.status = STATUS.OVER;
+        this.physics.box2d.pause();
 
         var zoom = this.zoom;
         if (zoom.scale.x !== 1) {
@@ -440,6 +456,9 @@ define(function (require) {
         //         break;
         // }
     };
+
+    // level.shutdown = function () {
+    // };
 
     return level;
 
