@@ -144,6 +144,8 @@ define(function (require) {
 
         this.physics.box2d.resume();
 
+        this.hero.wake();
+
         this.bindTouch();
         this.playUI = new PlayUI(this.game, {level: this});
         this.lightground.show(1000);
@@ -377,8 +379,7 @@ define(function (require) {
         this.complete();
 
         var me = this;
-
-        this.hero.goToTerminal(this.terrain.getTerminal())
+        this.hero.goToTerminal(this.terrain)
             .then(function () {
                 setTimeout(
                     function () {
@@ -393,13 +394,15 @@ define(function (require) {
         this.complete();
 
         var me = this;
-
-        setTimeout(
-            function () {
-                me.failureEnd = new FailureEnd(me.game, {progress: me.progress});
-            },
-            400
-        );
+        this.hero.fall(this.terrain)
+            .then(function () {
+                setTimeout(
+                    function () {
+                        me.failureEnd = new FailureEnd(me.game, {progress: me.progress});
+                    },
+                    400
+                );
+            });
     };
 
     level.complete = function () {

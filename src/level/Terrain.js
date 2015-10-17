@@ -6,8 +6,9 @@
 define(function (require) {
 
     var color = require('common/color');
+    var util = require('common/util');
 
-    var NUM_EXTREMUM = 500; // 偶数为佳
+    var NUM_EXTREMUM = 4; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -417,6 +418,24 @@ define(function (require) {
             x: lastPoint.x - 300,
             y: lastPoint.y
         };
+    };
+
+    proto.getNearestPoint = function (hero) {
+        var edgePoints = this.edgePoints;
+        var heroX = hero.body.x;
+
+        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
+            var points = edgePoints[extInd];
+            for (var pointInd = 0, pointsLen = points.length - 1; pointInd <= pointsLen; ++pointInd) {
+                var point = points[pointInd];
+                var distanceX = point.x - heroX;
+                if (distanceX >= 0 && distanceX < 10) {
+                    return util.extend({}, point);
+                }
+            }
+        }
+
+        return null;
     };
 
     return Terrain;

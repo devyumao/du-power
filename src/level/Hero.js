@@ -45,6 +45,8 @@ define(function (require) {
 
         this.isFlying = false;
 
+        this.hasReachedMinVel = false;
+
         this.init();
     }
 
@@ -62,8 +64,6 @@ define(function (require) {
         this.configCamera();
 
         this.sleep();
-
-        this.wake(); // TODO: 延时
     };
 
     proto.initSprite = function () {
@@ -124,7 +124,7 @@ define(function (require) {
         var fadeIn = game.add.tween(light)
             .to({alpha: 1}, 150, Easing.Quadratic.Out);
         var fadeOut = game.add.tween(light)
-            .to({alpha: 0}, 300, Easing.Quadratic.In, false, 300);
+            .to({alpha: 0}, 300, Easing.Quadratic.In, false, 200);
         fadeIn.chain(fadeOut).start();
     };
 
@@ -148,8 +148,9 @@ define(function (require) {
 
         // 添加/运行动画
         if (fps) {
-            !sprite.animations.getAnimation(action) && sprite.animations.add(action, null, fps, !!loop);
-            sprite.animations.play(action);
+            var animations = sprite.animations;
+            !animations.getAnimation(action) && animations.add(action, null, fps, !!loop);
+            animations.play(action);
         }
     };
 
@@ -180,6 +181,24 @@ define(function (require) {
     };
 
     /**
+     * 唤醒
+     *
+     * @public
+     */
+    proto.wake = function () {
+        this.act('wake', 5);
+
+        this.game.time.events.add(
+            1000,
+            function () {
+                this.body.applyForce(200, -200);
+                this.awake = true;
+            },
+            this
+        );
+    };
+
+    /**
      * 俯冲
      *
      * @public
@@ -191,16 +210,6 @@ define(function (require) {
             body.applyForce(0, 70); // TODO: 调参
         }
         this.act('dive');
-    };
-
-    /**
-     * 唤醒
-     *
-     * @public
-     */
-    proto.wake = function () {
-        this.body.applyForce(80, -200);
-        this.awake = true;
     };
 
     /**
@@ -220,6 +229,8 @@ define(function (require) {
      * 更新
      */
     proto.update = function () {
+        this.sprite.bringToTop(); // XXX: 可能有性能问题
+
         if (!this.awake) {
             return;
         }
@@ -232,7 +243,6 @@ define(function (require) {
             this.isFlying = false;
         }
 
-        this.sprite.bringToTop(); // XXX: 可能有性能问题
         this.updateStatus();
         this.limitVelocity();
         this.updateAngle();
@@ -245,14 +255,18 @@ define(function (require) {
         var body = this.body;
         var velocity = body.velocity;
         if (velocity.x < MIN_VELOCITY_X) {
-            velocity.x = MIN_VELOCITY_X;
+            if (this.hasReachedMinVel) {
+                velocity.x = MIN_VELOCITY_X;
+            }
         }
-        else if (velocity.x > MAX_VELOCITY_X) {
-            velocity.x = MAX_VELOCITY_X;
+        else {
+            this.hasReachedMinVel = true;
+            if (velocity.x > MAX_VELOCITY_X) {
+                velocity.x = MAX_VELOCITY_X;
+            }
         }
 
         // 进入顶部区域
-        // TODO: 上边界不封
         if (body.y < MIN_Y && velocity.y < 0) {
             velocity.y -= velocity.y / 10;
         }
@@ -326,20 +340,15 @@ define(function (require) {
         }
     };
 
-    proto.goToTerminal = function (terminal) {
+    proto.goTo = function (position, duration, ease) {
         var game = this.game;
-        var posTo = {
-            x: terminal.x,
-            y: terminal.y - this.radius
-        };
-        var duration = 400;
         var body = this.body;
 
         var rotate = game.add.tween(body)
             .to({angle: 0}, duration);
 
         var move = game.add.tween(body)
-            .to(posTo, duration);
+            .to(position, duration, ease);
         var promise = new Promise(function (resolve) {
             move.onComplete.add(resolve);
         });
@@ -348,6 +357,21 @@ define(function (require) {
         move.start();
 
         return promise;
+    };
+
+    proto.goToTerminal = function (terrain) {
+        var terminal = terrain.getTerminal();
+        terminal.y -= this.radius;
+
+        return this.goTo(terminal, 400, Phaser.Easing.Linear.None);
+    };
+
+    proto.fall = function (terrain) {
+        var position = terrain.getNearestPoint(this);
+        position.y -= this.radius;
+        var duration = Math.abs(this.body.y - position.y);
+
+        return this.goTo(position, Math.sqrt(duration) * 20, Phaser.Easing.Quadratic.In);
     };
 
     proto.render = function () {

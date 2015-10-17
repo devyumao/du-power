@@ -55,7 +55,8 @@ define(function (require) {
             'hero-up',
             'hero-fly',
             'hero-down',
-            'hero-dive'
+            'hero-dive',
+            'hero-wake'
         ].forEach(function (name) {
             game.load.spritesheet(name, path + name + suffix, 120, 212);
         });
