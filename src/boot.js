@@ -5,6 +5,8 @@
 
 define(function (require) {
 
+    var util = require('common/util');
+
     /**
      * 预加载
      */
@@ -22,9 +24,12 @@ define(function (require) {
 
         // 比例设置
         var scale = this.scale;
-        scale.scaleMode = Phaser.ScaleManager.SHOW_ALL; // 保持高宽比铺屏
-        scale.pageAlignHorizontally = true;
-        scale.pageAlignVertically = true;
+        scale.pageAlignHorizontally = true; // 水平居中
+        scale.pageAlignVertically = true; // 垂直居中
+        scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
+
+        // this.resize();
+
 
         // 避免玩家看到屏幕适应的过程
         setTimeout(
@@ -35,7 +40,24 @@ define(function (require) {
         );
     }
 
+    function resize() {
+        var scale = this.scale;
+
+        if (scale.isLandscape) {
+        }
+        else {
+            // scale.scaleMode = Phaser.ScaleManager.NO_SCALE;
+            // var game = this.game;
+            // var canvas = game.canvas;
+            // canvas.className = 'portrait';
+            // console.log(canvas.style);
+            // canvas.style.marginLeft = '200px';
+            // scale.setUserScale(1, 1, 200, 0);
+        }
+    }
+
     return {
+        resize: resize,
         preload: preload,
         create: create
     };

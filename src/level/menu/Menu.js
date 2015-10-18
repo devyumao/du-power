@@ -8,6 +8,7 @@ define(function (require) {
     var Mask = require('common/ui/Mask');
     var Start = require('./Start');
     var Title = require('./Title');
+    var BtnTicket = require('./BtnTicket');
 
     /**
      * 菜单类
@@ -30,9 +31,11 @@ define(function (require) {
 
         this.group = null;
 
-        this.start = null;
+        // this.start = null;
 
-        this.title = null;
+        // this.title = null;
+
+        // this.btnTicket = null;
 
         this.init();
     }
@@ -51,14 +54,12 @@ define(function (require) {
         this.mask = new Mask(game, {alpha: 0.4});
 
         var start = new Start(game, {level: level});
-        this.start = start;
-
         var title = new Title(game);
-        this.title = title;
+        var btnTicket = new BtnTicket(game);
 
         var group = game.add.group();
         group.fixedToCamera = true;
-        group.addMultiple([start.element, title.element]);
+        group.addMultiple([start.element, title.element, btnTicket.element]);
         this.group = group;
     };
 

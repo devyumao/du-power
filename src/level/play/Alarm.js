@@ -1,5 +1,5 @@
 /**
- * @file è­¦æŠ¥
+ * @file ¾¯±¨
  * @author yumao [zhangyu38@baidu.com]
  */
 
@@ -8,15 +8,15 @@ define(function (require) {
     var color = require('common/color');
 
     /**
-     * è­¦æŠ¥ç±»
+     * ¾¯±¨Àà
      *
      * @class
-     * @param {Phaser.Game} game æ¸¸æˆ
-     * @param {Object} options å‚æ•°é¡¹
+     * @param {Phaser.Game} game ÓÎÏ·
+     * @param {Object} options ²ÎÊıÏî
      */
     function Alarm(game, options) {
         /**
-         * æ¸¸æˆ
+         * ÓÎÏ·
          *
          * @type {Phaser.Game}
          */
@@ -40,7 +40,7 @@ define(function (require) {
     var proto = Alarm.prototype;
 
     /**
-     * åˆå§‹åŒ–
+     * ³õÊ¼»¯
      *
      * @private
      */

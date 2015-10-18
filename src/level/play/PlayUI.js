@@ -81,6 +81,8 @@ define(function (require) {
     };
 
     proto.destroy = function () {
+        var alarm = this.alarm;
+        alarm.isAlarming && alarm.recover();
         this.group.destroy();
     };
 

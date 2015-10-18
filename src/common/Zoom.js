@@ -32,7 +32,6 @@ define(function (require) {
 
         if (!duration) {
             util.extend(cameraBounds, boundsTo);
-            // Phaser.Utils.mixin(boundsTo, cameraBounds);
             this.scale.setTo(scale);
         }
         else {

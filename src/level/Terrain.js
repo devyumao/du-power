@@ -8,7 +8,7 @@ define(function (require) {
     var color = require('common/color');
     var util = require('common/util');
 
-    var NUM_EXTREMUM = 50; // 偶数为佳
+    var NUM_EXTREMUM = 4; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -207,7 +207,8 @@ define(function (require) {
             body.removeFixture(edge);
         };
 
-        var destroySprite = function (sprite) {
+        var destroySprite = function (sprite, index) {
+            // console.log(sprite.terrainType);
             sprite.key.destroy();
             sprite.destroy();
         };
@@ -259,6 +260,7 @@ define(function (require) {
 
             var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
             var sprite = game.add.sprite(pointA.x, 0, bitmap);
+            sprite.terrainType = 'tube'; // for test
             var childGroup = game.add.group();
             childGroup.addAt(sprite, SPRITE_INDEX.tube);
             spriteGroup.addAt(childGroup, i);
@@ -369,6 +371,7 @@ define(function (require) {
             if (sprite === -1) {
                 var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
                 sprite = game.add.sprite(pointA.x, 0, bitmap);
+                sprite.terrainType = 'current'; // for test 
                 childGroup.addAt(sprite, SPRITE_INDEX.current);
 
                 // var lastSprite = childGroup.getAt(SPRITE_INDEX.current - 1);

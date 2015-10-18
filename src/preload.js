@@ -40,12 +40,12 @@ define(function (require) {
 
         [
             'hero',
-            'start', 'start-ring', 'title', 'title-decoration',
+            'start', 'start-ring', 'title', 'title-decoration', 'button-ticket',
             'icon-back', 'icon-share', 'icon-restart',
             'success-title', 'ticket',
             'failure-title', 'progress-ring',
             'hero-label',
-            'button-pause', 'button-close',
+            'button-pause', 'button-close', 'button-back', 'button-restart',
             'charge', 'charge-double',
             'light-fly',
             'gesture', 'arrow-charge', 'arrow-current'
@@ -97,7 +97,7 @@ define(function (require) {
         game.sound.setDecodedCallback(
             [bgm],
             function () {
-                bgm.loopFull();
+                // bgm.loopFull();
             },
             this
         );

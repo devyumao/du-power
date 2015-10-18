@@ -92,14 +92,14 @@ define(function (require) {
         var LEVEL_STATUS = this.level.STATUS;
         var btnConfigList = [
             {
-                name: 'button-close',
+                name: 'button-back',
                 onClick: function () {
                     game.sound.play('click');
                     game.state.restart(true, false, LEVEL_STATUS.MENU);
                 }
             },
             {
-                name: 'button-close',
+                name: 'button-restart',
                 onClick: function () {
                     game.sound.play('click');
                     game.state.restart(true, false, LEVEL_STATUS.PLAY);

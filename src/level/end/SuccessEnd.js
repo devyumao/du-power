@@ -5,10 +5,9 @@
 
 define(function (require) {
 
-    var global = require('common/global');
-    var color = require('common/color');
     var util = require('common/util');
     var End = require('./End');
+    var Ticket = require('./Ticket');
 
     /**
      * 成功结束类
@@ -32,34 +31,8 @@ define(function (require) {
     var proto = SuccessEnd.prototype;
 
     proto.initContent = function () {
-        var game = this.game;
-
-        var ticket = game.add.image(game.width / 2, 130, 'ticket');
-        ticket.anchor.set(0.5, 0);
-        ticket.scale.set(0.64);
-
-        var datasource = require('common/datasource');
-        datasource.getCode()
-            .then(function (res) {
-                res = JSON.parse(res);
-                if (!res.success) {
-                    return;
-                }
-
-                var codeText = res.code.substring(1).split('').join(' ');
-                var code = game.add.text(
-                    0, 180,
-                    codeText,
-                    {
-                        font: 'bold 60px ' + global.fontFamily,
-                        fill: color.get('jujube')
-                    }
-                );
-                code.anchor.set(0.5, 0);
-                ticket.addChild(code);
-            });
-
-        this.content.add(ticket);
+        var ticket = new Ticket(this.game);
+        this.content.add(ticket.element);
     };
 
     return SuccessEnd;

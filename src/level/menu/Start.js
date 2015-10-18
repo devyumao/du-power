@@ -5,6 +5,8 @@
 
 define(function (require) {
 
+    var util = require('common/util');
+
     /**
      * 开始按钮类
      *
@@ -62,6 +64,7 @@ define(function (require) {
         );
         button.anchor.set(0.5);
         this.button = button;
+        util.addHover(button);
 
         // 绘制圆环
         var ring = game.add.image(0, 0, 'start-ring');

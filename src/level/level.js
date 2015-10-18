@@ -43,7 +43,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        this.status = STATUS.PLAY; // for dev
+        // this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -234,12 +234,6 @@ define(function (require) {
             // this.lightground.image
         ]);
         this.zoom = zoom;
-
-        // // for dev
-        // zoom.to(0.7);
-        // setTimeout(function () {
-        //     zoom.to(1);
-        // }, 3000);
     };
 
     /**
@@ -324,7 +318,7 @@ define(function (require) {
     };
 
     level.updateOnce = function () {
-        this.updateZoom();
+        this.updateCamera();
 
         this.power.update();
         this.terrain.update();
@@ -332,15 +326,26 @@ define(function (require) {
     };
 
     // FIX: 单独文件
-    level.updateZoom = function () {
+    level.updateCamera = function () {
         var game = this.game;
+        var hero = this.hero;
+        var heroSprite = hero.sprite;
+        var camera = this.camera;
         var zoom = this.zoom;
-        var deadzone = game.camera.deadzone;
-        var heroBottom = this.world.height - this.hero.sprite.y;
-        var fullHeight = heroBottom + deadzone.y;
+        var world = this.world;
+
+        var deadzone = {
+            x: 100, y: 100 * zoom.scale.y
+        };
+
+        var fullHeight = world.height - heroSprite.y + deadzone.y;
         var scale = game.height < fullHeight ? game.height / fullHeight : 1;
+
         zoom.to(scale);
-        deadzone.y = 60 * scale; // FIX: deadzone 参数常量
+
+        var deltaWG = world.height - game.height;
+        camera.y = heroSprite.y - deadzone.y > deltaWG ? deltaWG : heroSprite.y - deadzone.y;
+        camera.x = heroSprite.x * scale - deadzone.x;
     };
 
     level.updateView = function () {
@@ -438,22 +443,18 @@ define(function (require) {
     };
 
     level.complete = function () {
-        var game = this.game;
-
         this.status = STATUS.OVER;
         this.physics.box2d.pause();
 
-        var zoom = this.zoom;
-        if (zoom.scale.x !== 1) {
-            zoom.to(1, 200);
-            game.camera.deadzone.y = 60; // TODO: config
-        }
+        // var zoom = this.zoom;
+        // if (zoom.scale.x !== 1) {
+        //     var duration = 200;
+        //     zoom.to(1, duration);
+        // }
 
         this.playUI.destroy();
 
-        // TODO: 更新电流
-
-        this.lightground.hide(0);
+        this.lightground.hide(500);
     };
 
     level.render = function () {
@@ -473,8 +474,6 @@ define(function (require) {
                 // game.debug.geom(this.floor, debugColor);
 
                 game.context.fillStyle = debugColor;
-                var zone = game.camera.deadzone;
-                game.context.fillRect(zone.x, zone.y, zone.width, zone.height);
 
                 this.hero.render();
 

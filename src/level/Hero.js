@@ -61,7 +61,7 @@ define(function (require) {
         this.initSprite();
         this.initBody();
         this.initLight();
-        this.configCamera();
+        // this.configCamera();
 
         this.sleep();
     };
@@ -98,7 +98,7 @@ define(function (require) {
 
     proto.configCamera = function () {
         var game = this.game;
-        game.camera.follow(this.sprite); // TODO: fix follow bug
+        // game.camera.follow(this.sprite); // TODO: fix follow bug
         game.camera.deadzone = new Phaser.Rectangle(
             100, 60,
             0, 0
