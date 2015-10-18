@@ -5,6 +5,7 @@
 
 define(function (require) {
 
+    var global = require('common/global');
     var Mask = require('common/ui/Mask');
     var Start = require('./Start');
     var Title = require('./Title');
@@ -55,12 +56,16 @@ define(function (require) {
 
         var start = new Start(game, {level: level});
         var title = new Title(game);
-        var btnTicket = new BtnTicket(game);
 
         var group = game.add.group();
         group.fixedToCamera = true;
-        group.addMultiple([start.element, title.element, btnTicket.element]);
+        group.addMultiple([start.element, title.element]);
         this.group = group;
+
+        if (global.getTicket()) {
+            var btnTicket = new BtnTicket(game);
+            group.add(btnTicket.element);
+        }
     };
 
     proto.destroy = function () {

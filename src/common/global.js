@@ -5,6 +5,8 @@
 
 define(function (require) {
 
+    var datasource = require('common/datasource');
+
     var MODE = {
         DEV: 0,
         PROD: 1
@@ -12,7 +14,8 @@ define(function (require) {
 
     var storagePrefix = 'dupower-';
     var storageKey = {
-        novice: storagePrefix + 'novice'
+        novice: storagePrefix + 'novice',
+        ticket: storagePrefix + 'ticket'
     };
 
     var global = {
@@ -26,11 +29,14 @@ define(function (require) {
 
         fontFamily: '"Helvetica Neue", Helvetica, STHeiTi, sans-serif',
 
-        novice: null
+        novice: null,
+        ticket: null
     };
 
     global.init = function () {
+        this.initResourceConfig();
         this.initNovice();
+        this.initTicket();
     };
 
     // ==================== mode
@@ -89,6 +95,37 @@ define(function (require) {
     global.setNovice = function (novice) {
         this.novice = novice;
         localStorage.setItem(storageKey.novice, novice);
+    };
+
+    // ==================== 奖券
+    global.initTicket = function () {
+        // var ticket = localStorage.getItem(storageKey.ticket);
+        // this.ticket = ticket !== null ? JSON.parse(ticket) : false;
+
+        var me = this;
+        datasource.load(
+            ['ticket'],
+            function (res) {
+                res = JSON.parse(res);
+                me.ticket = res.ticket ? JSON.parse(res.ticket) : false;
+            },
+            function (err) {
+                me.ticket = false;
+            }
+        );
+    };
+
+    global.getTicket = function () {
+        return this.ticket;
+    };
+
+    global.setTicket = function (ticket) {
+        this.ticket = ticket;
+        // localStorage.setItem(storageKey.ticket, ticket);
+
+        datasource.save({
+            ticket: ticket
+        });
     };
 
     global.init();

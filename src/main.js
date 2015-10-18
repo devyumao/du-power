@@ -11,8 +11,6 @@ define(function (require) {
      * 初始化
      */
     function init() {
-        global.initResourceConfig();
-
         if (global.isProdMode()) {
             require('common/weixin').init();
         }

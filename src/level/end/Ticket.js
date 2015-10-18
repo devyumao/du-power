@@ -49,11 +49,10 @@ define(function (require) {
         datasource.getCode()
             .then(function (res) {
                 res = JSON.parse(res);
-                if (!res.success) {
-                    return;
-                }
+                var codeText = res.success
+                    ? res.code.substring(1).split('').join(' ')
+                    : '奖券已领完';
 
-                var codeText = res.code.substring(1).split('').join(' ');
                 var code = game.add.text(
                     0, 180,
                     codeText,
@@ -64,6 +63,8 @@ define(function (require) {
                 );
                 code.anchor.set(0.5, 0);
                 ticket.addChild(code);
+
+                global.setTicket(true);
             });
 
     };
