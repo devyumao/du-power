@@ -5,7 +5,7 @@
 
 define(function (require) {
 
-    // var global = require('common/global');
+    var global = require('common/global');
     var color = require('common/color');
     var util = require('common/util');
 
@@ -43,7 +43,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        this.status = STATUS.PLAY; // for dev
+        // this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -68,7 +68,6 @@ define(function (require) {
             isTouching: false,
             isPaused: false,
             hasUpdated: false,
-            hasTutorialShown: false, // temp
 
             progress: 0,
 
@@ -102,7 +101,6 @@ define(function (require) {
         // mask.hide(150); // 会自动销毁
 
         // for dev
-        // var tutorial = new Tutorial(this.game, {level: this});
     };
 
     /**
@@ -355,7 +353,7 @@ define(function (require) {
     level.updatePlay = function () {
         var hero = this.hero;
 
-        if (!this.hasTutorialShown && hero.hasReachedMinVel) {
+        if (global.getNovice() && hero.hasReachedMinVel) {
             var game = this.game;
             game.time.events.add(
                 300,
@@ -366,7 +364,7 @@ define(function (require) {
                 this
             );
 
-            this.hasTutorialShown = true;
+            global.setNovice(false);
         }
 
         var terrain = this.terrain;

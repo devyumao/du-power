@@ -10,6 +10,11 @@ define(function (require) {
         PROD: 1
     };
 
+    var storagePrefix = 'dupower-';
+    var storageKey = {
+        novice: storagePrefix + 'novice'
+    };
+
     var global = {
         mode: MODE.DEV,
 
@@ -19,7 +24,13 @@ define(function (require) {
 
         signPackage: null,
 
-        fontFamily: '"Helvetica Neue", Helvetica, STHeiTi, sans-serif'
+        fontFamily: '"Helvetica Neue", Helvetica, STHeiTi, sans-serif',
+
+        novice: null
+    };
+
+    global.init = function () {
+        this.initNovice();
     };
 
     // ==================== mode
@@ -64,6 +75,23 @@ define(function (require) {
     global.setSignPackage = function (obj) {
         this.signPackage = obj;
     };
+
+    // ==================== 新手
+    global.initNovice = function () {
+        var novice = localStorage.getItem(storageKey.novice);
+        this.novice = novice !== null ? JSON.parse(novice) : true;
+    };
+
+    global.getNovice = function () {
+        return this.novice;
+    };
+
+    global.setNovice = function (novice) {
+        this.novice = novice;
+        localStorage.setItem(storageKey.novice, novice);
+    };
+
+    global.init();
 
     return global;
 
