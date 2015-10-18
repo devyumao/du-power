@@ -122,7 +122,7 @@ define(function (require) {
         var Easing = Phaser.Easing;
 
         var fadeIn = game.add.tween(light)
-            .to({alpha: 1}, 150, Easing.Quadratic.Out);
+            .to({alpha: 1}, 50, Easing.Quadratic.Out);
         var fadeOut = game.add.tween(light)
             .to({alpha: 0}, 300, Easing.Quadratic.In, false, 200);
         fadeIn.chain(fadeOut).start();
@@ -385,7 +385,7 @@ define(function (require) {
     };
 
     proto.fall = function (terrain) {
-        this.shutdonw();
+        this.shutdown();
 
         var position = terrain.getNearestPoint(this);
         position.y -= this.radius;

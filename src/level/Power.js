@@ -56,12 +56,13 @@ define(function (require) {
 
     proto.update = function () {
         var level = this.level;
-        var heroBody = level.hero.body;
+        var hero = level.hero;
+        var heroBody = hero.body;
         var newValue;
 
         this.lastStatus = this.status;
 
-        if (level.status !== level.STATUS.PLAY) {
+        if (level.status !== level.STATUS.PLAY || !hero.hasReachedMinVel) {
             this.status = STATUS.STABLE;
             return;
         }

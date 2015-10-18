@@ -64,6 +64,16 @@ define(function (require) {
         this.group = group;
     };
 
+    proto.pauseAnim = function () {
+        var currentAnim = this.sprite.animations.currentAnim;
+        currentAnim.stop();
+    };
+
+    proto.resumeAnim = function () {
+        var currentAnim = this.sprite.animations.currentAnim;
+        currentAnim.play();
+    };
+
     return Flag;
 
 });

@@ -13,6 +13,7 @@ define(function (require) {
     var Zoom = require('common/Zoom');
 
     var Menu = require('./menu/Menu');
+    var Tutorial = require('./tutorial/Tutorial');
     var PlayUI = require('./play/PlayUI');
     var SuccessEnd = require('./end/SuccessEnd');
     var FailureEnd = require('./end/FailureEnd');
@@ -42,7 +43,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        // this.status = STATUS.PLAY; // for dev
+        this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -57,7 +58,8 @@ define(function (require) {
             power: null,
 
             menuUI: null,
-
+            playUI: null,
+            tutorial: null,
             successEnd: null,
             failureEnd: null,
 
@@ -66,6 +68,7 @@ define(function (require) {
             isTouching: false,
             isPaused: false,
             hasUpdated: false,
+            hasTutorialShown: false, // temp
 
             progress: 0,
 
@@ -99,6 +102,7 @@ define(function (require) {
         // mask.hide(150); // 会自动销毁
 
         // for dev
+        // var tutorial = new Tutorial(this.game, {level: this});
     };
 
     /**
@@ -273,20 +277,22 @@ define(function (require) {
     level.pause = function () {
         this.isPaused = true;
         this.physics.box2d.pause();
-        this.pauseAnimations();
+        this.pauseAnim();
     };
 
-    level.pauseAnimations = function () {
+    level.pauseAnim = function () {
+        this.terrain.pauseAnim();
         this.hero.pauseAct();
     };
 
     level.resume = function () {
         this.isPaused = false;
         this.physics.box2d.resume();
-        this.resumeAnimations();
+        this.resumeAnim();
     };
 
-    level.resumeAnimations = function () {
+    level.resumeAnim = function () {
+        this.terrain.resumeAnim();
         this.hero.resumeAct();
     };
 
@@ -347,8 +353,23 @@ define(function (require) {
     };
 
     level.updatePlay = function () {
-        var terrain = this.terrain;
         var hero = this.hero;
+
+        if (!this.hasTutorialShown && hero.hasReachedMinVel) {
+            var game = this.game;
+            game.time.events.add(
+                300,
+                function () {
+                    this.pause();
+                    this.tutorial = new Tutorial(game, {level: this});
+                },
+                this
+            );
+
+            this.hasTutorialShown = true;
+        }
+
+        var terrain = this.terrain;
         var heroX = hero.getX();
 
         this.progress = heroX < terrain.distance ? heroX / terrain.distance : 1;

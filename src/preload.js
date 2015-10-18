@@ -45,7 +45,8 @@ define(function (require) {
             'hero-label',
             'button-pause', 'button-close',
             'charge', 'charge-double',
-            'light-fly'
+            'light-fly',
+            'gesture', 'arrow-charge', 'arrow-current'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });

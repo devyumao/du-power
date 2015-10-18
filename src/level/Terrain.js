@@ -8,7 +8,7 @@ define(function (require) {
     var color = require('common/color');
     var util = require('common/util');
 
-    var NUM_EXTREMUM = 4; // 偶数为佳
+    var NUM_EXTREMUM = 50; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -171,6 +171,14 @@ define(function (require) {
         if (game.camera.x / this.level.zoom.scale.x > boundsLeft) {
             this.initFlag();
         }
+    };
+
+    proto.pauseAnim = function () {
+        this.hasFlag && this.flag.pauseAnim();
+    };
+
+    proto.resumeAnim = function () {
+        this.hasFlag && this.flag.resumeAnim();
     };
 
     proto.getPenult = function () {
