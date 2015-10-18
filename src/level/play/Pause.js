@@ -58,12 +58,14 @@ define(function (require) {
             'button-pause',
             function () {
                 if (this.isCollapsed) {
+                    game.sound.play('click');
                     this.level.pause();
                     trigger.loadTexture('button-close');
                     this.isCollapsed = false;
                     this.menu.visible = true;
                 }
                 else {
+                    game.sound.play('click');
                     this.level.resume();
                     trigger.loadTexture('button-pause');
                     this.isCollapsed = true;
@@ -92,12 +94,14 @@ define(function (require) {
             {
                 name: 'button-close',
                 onClick: function () {
+                    game.sound.play('click');
                     game.state.restart(true, false, LEVEL_STATUS.MENU);
                 }
             },
             {
                 name: 'button-close',
                 onClick: function () {
+                    game.sound.play('click');
                     game.state.restart(true, false, LEVEL_STATUS.PLAY);
                 }
             }

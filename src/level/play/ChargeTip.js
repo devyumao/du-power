@@ -78,19 +78,23 @@ define(function (require) {
     };
 
     proto.update = function () {
-        var power = this.level.power;
+        var level = this.level;
+        var sound = level.sound;
+        var power = level.power;
         var STATUS = power.STATUS;
         var lastStatus = power.lastStatus;
 
         switch (power.status) {
             case STATUS.NORMAL_CHARGE:
                 if (lastStatus === STATUS.LOSING) {
+                    sound.play('charge');
                     this.addTip('charge');
                 }
                 break;
 
             case STATUS.SUPER_CHARGE:
                 if (lastStatus === STATUS.NORMAL_CHARGE) {
+                    sound.play('charge-double');
                     this.addTip('charge-double');
                 }
                 break;

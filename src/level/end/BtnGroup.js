@@ -59,6 +59,7 @@ define(function (require) {
                 name: 'icon-back',
                 scale: 0.7,
                 onClick: function () {
+                    game.sound.play('click');
                     transition()
                         .then(function () {
                             game.state.restart(true, false, LEVEL_STATUS.MENU);
@@ -69,12 +70,14 @@ define(function (require) {
                 name: 'icon-share',
                 scale: 0.7,
                 onClick: function () {
+                    game.sound.play('click');
                 }
             },
             {
                 name: 'icon-restart',
                 scale: 0.7,
                 onClick: function () {
+                    game.sound.play('click');
                     transition()
                         .then(function () {
                             game.state.restart(true, false, LEVEL_STATUS.PLAY);

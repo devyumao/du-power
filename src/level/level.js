@@ -43,7 +43,7 @@ define(function (require) {
         this.reset();
 
         this.status = status;
-        // this.status = STATUS.PLAY; // for dev
+        this.status = STATUS.PLAY; // for dev
     };
 
     level.reset = function () {
@@ -397,6 +397,7 @@ define(function (require) {
 
     level.finish = function () {
         this.complete();
+        this.sound.play('finish');
 
         var me = this;
         var hero = this.hero;
@@ -417,6 +418,7 @@ define(function (require) {
 
     level.fail = function () {
         this.complete();
+        this.sound.play('fall');
 
         var me = this;
         var hero = this.hero;
@@ -459,35 +461,35 @@ define(function (require) {
 
         game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
 
-        // switch (this.status) {
-        //     case STATUS.MENU:
-        //         break;
+        switch (this.status) {
+            case STATUS.MENU:
+                break;
 
-        //     case STATUS.PLAY:
-        //         var debugColor = 'rgba(255, 0, 0, 0.6)';
+            case STATUS.PLAY:
+                var debugColor = 'rgba(255, 0, 0, 0.6)';
 
-        //         // game.debug.box2dWorld();
-        //         // game.debug.geom(this.ceiling, debugColor);
-        //         // game.debug.geom(this.floor, debugColor);
+                // game.debug.box2dWorld();
+                // game.debug.geom(this.ceiling, debugColor);
+                // game.debug.geom(this.floor, debugColor);
 
-        //         game.context.fillStyle = debugColor;
-        //         var zone = game.camera.deadzone;
-        //         game.context.fillRect(zone.x, zone.y, zone.width, zone.height);
+                game.context.fillStyle = debugColor;
+                var zone = game.camera.deadzone;
+                game.context.fillRect(zone.x, zone.y, zone.width, zone.height);
 
-        //         this.hero.render();
+                this.hero.render();
 
-        //         game.debug.text(
-        //             'progress: ' + (this.progress * 100).toFixed(0) + '%',
-        //             2, 74,
-        //             '#fff'
-        //         );
+                game.debug.text(
+                    'progress: ' + (this.progress * 100).toFixed(0) + '%',
+                    2, 74,
+                    '#fff'
+                );
 
-        //         game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
+                game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
 
-        //         this.power.render();
+                this.power.render();
 
-        //         break;
-        // }
+                break;
+        }
     };
 
     // level.shutdown = function () {

@@ -186,17 +186,19 @@ define(function (require) {
      * @public
      */
     proto.wake = function () {
-        var timeEvents = this.game.time.events;
+        var game = this.game;
+        var timeEvents = game.time.events;
 
-        this.game.time.events.add(
+        timeEvents.add(
             200,
             function () {
+                game.sound.play('wake');
                 this.act('wake', 5);
             },
             this
         );
 
-        this.game.time.events.add(
+        timeEvents.add(
             1300,
             function () {
                 this.body.applyForce(200, -200);
@@ -336,11 +338,20 @@ define(function (require) {
                 }
                 else {
                     if (angle < 0) {
-                        if (this.flyingFrameCount >= 10) {
+                        if (this.flyingFrameCount >= 12) {
                             var velocity = body.velocity;
                             if (!this.isFlying && velocity.y < 0) {
                                 var speed = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
-                                speed >= 350 && this.showLight();
+                                if (speed >= 500) {
+                                    level.sound.play('fly');
+                                    this.showLight();
+                                    speed >= 700 && level.time.events.add(
+                                        250,
+                                        function () {
+                                            level.sound.play('yell');
+                                        }
+                                    );
+                                }
                             }
                             this.fly();
                             this.isFlying = true;
@@ -399,6 +410,11 @@ define(function (require) {
         var velocity = this.body.velocity;
         game.debug.text('vx: ' + velocity.x.toFixed(2), 2, 34, '#fff');
         game.debug.text('vy: ' + velocity.y.toFixed(2), 2, 54, '#fff');
+        game.debug.text(
+            'speed: ' + Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2)).toFixed(0),
+            2, 134,
+            '#fff'
+        );
     };
 
     return Hero;

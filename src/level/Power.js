@@ -37,15 +37,21 @@ define(function (require) {
 
         this.lossFreq = 0.5;
 
-        this.normalCharge = 0.4;
+        // for dev
+        // this.value = 160;
+        // this.lossFreq = 0.5;
+
+        this.normalCharge = 0.5;
         this.normalThreshold = game.world.height - 450;
 
-        this.superCharge = 0.8;
+        this.superCharge = 1;
         this.superThreshold = game.world.height - 580;
 
         this.status = STATUS.LOSING;
 
         this.lastStatus = this.status;
+
+        this.lowThreshold = 150;
 
         // this.init();
     }
@@ -90,6 +96,10 @@ define(function (require) {
                 this.status = STATUS.EMPTY;
             }
         }
+    };
+
+    proto.isLow = function () {
+        return this.value < this.lowThreshold;
     };
 
     proto.render = function () {

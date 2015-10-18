@@ -51,6 +51,8 @@ define(function (require) {
             game.width / 2, game.height / 2,
             'start',
             function () {
+                game.sound.play('click');
+
                 button.inputEnabled = false;
                 this.fadeOut();
 

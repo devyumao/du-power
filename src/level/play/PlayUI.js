@@ -5,6 +5,7 @@
 
 define(function (require) {
 
+    var Alarm = require('./Alarm');
     var Roadmap = require('./Roadmap');
     var Pause = require('./Pause');
     var ChargeTip = require('./ChargeTip');
@@ -28,6 +29,8 @@ define(function (require) {
 
         this.group = null;
 
+        this.alarm = null;
+
         this.roadmap = null;
 
         this.pause = null;
@@ -48,6 +51,9 @@ define(function (require) {
         var game = this.game;
         var level = this.level;
 
+        var alarm = new Alarm(game, {level: level});
+        this.alarm = alarm;
+
         var roadmap = new Roadmap(game, {level: level});
         this.roadmap = roadmap;
 
@@ -60,6 +66,7 @@ define(function (require) {
         var group = game.add.group();
         group.fixedToCamera = true;
         group.addMultiple([
+            alarm.element,
             roadmap.element,
             pause.group,
             chargeTip.group
@@ -68,6 +75,7 @@ define(function (require) {
     };
 
     proto.update = function () {
+        this.alarm.update();
         this.roadmap.update();
         this.chargeTip.update();
     };
