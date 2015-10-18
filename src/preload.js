@@ -80,7 +80,8 @@ define(function (require) {
             'click',
             'wake', 'fly', 'yell',
             'charge', 'charge-double',
-            'finish', 'fall'
+            'finish', 'fall',
+            'alarm'
         ].forEach(function (name) {
             game.load.audio(name, [global.audioPath + name + '.mp3', global.audioPath + name + '.ogg']);
         });

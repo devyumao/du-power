@@ -32,6 +32,8 @@ define(function (require) {
 
         this.tween = null;
 
+        this.audio = null;
+
         this.init();
     }
 
@@ -72,9 +74,11 @@ define(function (require) {
         var image = this.image;
 
         image.visible = 1;
+
         this.tween = game.add.tween(this.image)
             .from({alpha: 0}, 500, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true)
             .start();
+        this.audio = game.sound.play('alarm', 1, true);
         this.isAlarming = true;
     };
 
@@ -84,6 +88,7 @@ define(function (require) {
         image.alpha = 0.5;
 
         this.tween.stop(true);
+        this.audio.stop();
         this.isAlarming = false;
     };
 

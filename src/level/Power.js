@@ -38,7 +38,7 @@ define(function (require) {
         this.lossFreq = 0.5;
 
         // for dev
-        // this.value = 160;
+        // this.value = 150;
         // this.lossFreq = 0.5;
 
         this.normalCharge = 0.5;
