@@ -14,6 +14,18 @@ define(function (require) {
     var util = {};
 
     /**
+     * 根据概率随机命中
+     *
+     * @param {number} p 概率
+     * @return {boolean} 是否命中
+     */
+    util.proba = function (p) {
+        p = p * 10 || 1;
+        var odds = Math.floor(Math.random() * 10);
+        return p === 1 || odds < p;
+    };
+
+    /**
      * 设置继承关系
      *
      * @param {Function} type 子类

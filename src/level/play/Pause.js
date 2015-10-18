@@ -5,7 +5,9 @@
 
 define(function (require) {
 
+    var color = require('common/color');
     var util = require('common/util');
+    var Mask = require('common/ui/Mask');
 
     /**
      * 暂停类
@@ -90,19 +92,32 @@ define(function (require) {
         var me = this;
         var trigger = this.trigger;
         var LEVEL_STATUS = this.level.STATUS;
+
+        var transition = function () {
+            // 用遮掩层过渡
+            var mask = new Mask(game, {color: color.get('black'), alpha: 1});
+            return mask.show(150); // 会自动销毁
+        };
+
         var btnConfigList = [
             {
                 name: 'button-back',
                 onClick: function () {
                     game.sound.play('click');
-                    game.state.restart(true, false, LEVEL_STATUS.MENU);
+                    transition()
+                        .then(function () {
+                            game.state.restart(true, false, LEVEL_STATUS.MENU);
+                        });
                 }
             },
             {
                 name: 'button-restart',
                 onClick: function () {
                     game.sound.play('click');
-                    game.state.restart(true, false, LEVEL_STATUS.PLAY);
+                    transition()
+                        .then(function () {
+                            game.state.restart(true, false, LEVEL_STATUS.PLAY);
+                        });
                 }
             }
         ];

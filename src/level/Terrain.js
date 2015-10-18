@@ -8,11 +8,12 @@ define(function (require) {
     var color = require('common/color');
     var util = require('common/util');
 
-    var NUM_EXTREMUM = 4; // 偶数为佳
+    var NUM_EXTREMUM = 20; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
-        current: 1
+        current: 1,
+        logo: 2
     };
 
     /**
@@ -40,7 +41,9 @@ define(function (require) {
 
         this.edgePoints = [];
 
-        this.spriteGroup = game.add.group();
+        this.tubes = [];
+
+        this.currents = [];
 
         this.flag = null;
 
@@ -111,7 +114,8 @@ define(function (require) {
         var extremums = [
             {x: -60, y: worldHeight - 80},
             {x: 100, y: worldHeight - 160}, // TODO: config
-            {x: 300, y: worldHeight - 40}
+            {x: 320, y: worldHeight - 40},
+            {x: 600, y: worldHeight - 200}
         ];
 
         // extremums[0] = {
@@ -126,7 +130,7 @@ define(function (require) {
         var minHeight = 30;
         var maxHeight = 360;
 
-        for (var i = 3; i <= NUM_EXTREMUM - 2; ++i) {
+        for (var i = extremums.length; i <= NUM_EXTREMUM - 2; ++i) {
             var pointA = extremums[i - 1];
 
             var bY;
@@ -159,6 +163,7 @@ define(function (require) {
         this.updateEdges();
         this.updateCurrents();
         this.updateFlag();
+        // this.updateLogos();
     };
 
     proto.updateFlag = function () {
@@ -200,17 +205,12 @@ define(function (require) {
         var body = this.body;
         var extremums = this.extremums;
         var edges = this.edges;
-        var spriteGroup = this.spriteGroup;
+        var currents = this.currents;
+        var tubes = this.tubes;
         var zoom = this.level.zoom;
 
         var removeEdge = function (edge) {
             body.removeFixture(edge);
-        };
-
-        var destroySprite = function (sprite, index) {
-            // console.log(sprite.terrainType);
-            sprite.key.destroy();
-            sprite.destroy();
         };
 
         for (var prevI = this.nextExtremumIndex; prevI > this.prevExtremumIndex; --prevI) {
@@ -219,8 +219,15 @@ define(function (require) {
                 edges[prevI].forEach(removeEdge);
                 edges[prevI] = null;
 
-                var childGroup = spriteGroup.getAt(prevI);
-                childGroup.forEach(destroySprite);
+                var current = currents[prevI];
+                current.key.destroy();
+                current.destroy();
+                currents[prevI] = null;
+
+                var tube = tubes[prevI];
+                tube.key.destroy();
+                tube.destroy();
+                tube[prevI] = null;
 
                 this.prevExtremumIndex = prevI;
 
@@ -235,9 +242,9 @@ define(function (require) {
         var extremums = this.extremums;
         var edges = this.edges;
         var edgePoints = this.edgePoints;
-        var spriteGroup = this.spriteGroup;
         var tubeWidth = 12;
         var zoom = this.level.zoom;
+        var tubes = this.tubes;
 
         for (var i = this.nextExtremumIndex; i < NUM_EXTREMUM - 1; ++i) {
             var pointA = extremums[i];
@@ -261,9 +268,8 @@ define(function (require) {
             var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
             var sprite = game.add.sprite(pointA.x, 0, bitmap);
             sprite.terrainType = 'tube'; // for test
-            var childGroup = game.add.group();
-            childGroup.addAt(sprite, SPRITE_INDEX.tube);
-            spriteGroup.addAt(childGroup, i);
+            tubes[i] = sprite;
+            zoom.add(sprite);
 
             var points = [p0];
 
@@ -338,11 +344,11 @@ define(function (require) {
     proto.renderCurrents = function () {
         var game = this.game;
         var extremums = this.extremums;
-        var spriteGroup = this.spriteGroup;
         var edgePoints = this.edgePoints;
         var level = this.level;
         var zoom = level.zoom;
         var power = level.power;
+        var currents = this.currents;
 
         if (this.cAlpha >= 1) {
             this.cAlphaDeltaSign = -1;
@@ -352,7 +358,7 @@ define(function (require) {
         }
         this.cAlpha += this.cAlphaDeltaSign * 0.02;
 
-        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
+        for (var extInd = this.prevExtremumIndex; extInd < this.nextExtremumIndex; ++extInd) {
             var pointA = extremums[extInd];
             // if (pointA.x + SEGMENT_WIDTH <= game.camera.x / zoom.scale.x) {
             //     continue;
@@ -363,23 +369,38 @@ define(function (require) {
 
             var pointB = extremums[extInd + 1];
 
-            var childGroup = spriteGroup.getAt(extInd);
-            if (childGroup === -1) {
-                break;
-            }
-            var sprite = childGroup.getAt(SPRITE_INDEX.current);
-            if (sprite === -1) {
+            var sprite = currents[extInd];
+            if (!sprite) {
                 var bitmap = game.add.bitmapData(pointB.x - pointA.x, game.world.height);
                 sprite = game.add.sprite(pointA.x, 0, bitmap);
-                sprite.terrainType = 'current'; // for test 
-                childGroup.addAt(sprite, SPRITE_INDEX.current);
-
-                // var lastSprite = childGroup.getAt(SPRITE_INDEX.current - 1);
-                // var lastAlpha = lastSprite === -1 ? 0.5 : lastSprite.alpha
-                // game.add.tween(sprite)
-                //     .to({alpha: lastAlpha}, 200, Phaser.Easing.Linear.None, true, 0, -1, true);
+                sprite.terrainType = 'current'; // for test
+                currents[extInd] = sprite;
+                zoom.add(sprite);
             }
             this.drawCurrents(sprite, edgePoints[extInd]);
+        }
+    };
+
+    proto.updateLogos = function () {
+        var game = this.game;
+        var extremums = this.extremums;
+        var spriteGroup = this.spriteGroup;
+
+        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
+            if ((extInd === 3 || (extInd % 2 && util.proba(0.25)))
+                && extInd !== NUM_EXTREMUM - 1) {
+
+                var childGroup = spriteGroup.getAt(extInd);
+                if (childGroup === -1) {
+                    break;
+                }
+
+                var sprite = childGroup.getAt(SPRITE_INDEX.logo);
+                if (sprite === -1) {
+                    var ext = extremums[extInd];
+                    console.log(ext);
+                }
+            }
         }
     };
 

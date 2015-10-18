@@ -6,6 +6,7 @@
 define(function (require) {
 
     var global = require('common/global');
+    var color = require('common/color');
 
     var state = {};
 
@@ -21,6 +22,23 @@ define(function (require) {
      * 初始化载入画面
      */
     state.initLoading = function () {
+        var game = this.game;
+
+        var hero = game.add.sprite(game.width / 2, game.height / 2, 'hero-sleep');
+        hero.anchor.set(0.5);
+        var action = 'sleep';
+        hero.animations.add(action);
+        hero.animations.play(action, 5, true);
+
+        var text = game.add.text(
+            game.width / 2, 340,
+            'SSGer 启动中...',
+            {
+                font: 'bold 30px ' + global.fontFamily,
+                fill: color.get('electric')
+            }
+        );
+        text.anchor.set(0.5);
     };
 
     /**
@@ -48,13 +66,14 @@ define(function (require) {
             'button-pause', 'button-close', 'button-back', 'button-restart',
             'charge', 'charge-double',
             'light-fly',
-            'gesture', 'arrow-charge', 'arrow-current'
+            'gesture', 'arrow-charge', 'arrow-current',
+            'baidu'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
 
         [
-            'hero-sleep',
+            // 'hero-sleep',
             'hero-up',
             'hero-fly',
             'hero-down',

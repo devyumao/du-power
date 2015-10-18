@@ -6,10 +6,10 @@
 define(function (require) {
 
     var global = require('common/global');
-    var color = require('common/color');
+    // var color = require('common/color');
     var util = require('common/util');
 
-    var Mask = require('common/ui/Mask');
+    // var Mask = require('common/ui/Mask');
     var Zoom = require('common/Zoom');
 
     var Menu = require('./menu/Menu');
@@ -228,8 +228,7 @@ define(function (require) {
     level.initZoom = function () {
         var zoom = new Zoom(this.game);
         zoom.addMultiple([
-            this.hero.sprite,
-            this.terrain.spriteGroup
+            this.hero.sprite
             // TODO
             // this.lightground.image
         ]);

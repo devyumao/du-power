@@ -64,7 +64,10 @@ define(function (require) {
                 code.anchor.set(0.5, 0);
                 ticket.addChild(code);
 
-                global.setTicket(true);
+                // XXX: 过了时间 传个 false 给我
+                if (res.success && !global.getTicket()) {
+                    global.setTicket(true);
+                }
             });
 
     };

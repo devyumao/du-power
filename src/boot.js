@@ -6,11 +6,13 @@
 define(function (require) {
 
     var util = require('common/util');
+    var global = require('common/global');
 
     /**
      * 预加载
      */
     function preload() {
+        this.game.load.spritesheet('hero-sleep', global.imgPath + 'hero-sleep' + global.imgSuffix, 120, 212);
     }
 
     /**
@@ -27,7 +29,7 @@ define(function (require) {
         scale.pageAlignHorizontally = true; // 水平居中
         scale.pageAlignVertically = true; // 垂直居中
         scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-
+        scale.forceOrientation(true);
         // this.resize();
 
 

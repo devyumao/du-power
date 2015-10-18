@@ -165,7 +165,7 @@ define(function (require) {
     };
 
     proto.sleep = function () {
-        this.act('sleep', 6, true);
+        this.act('sleep', 5, true);
     };
 
     proto.up = function () {
