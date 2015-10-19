@@ -55,19 +55,29 @@ define(function (require) {
 
         var btnGroup = new BtnGroup(game);
 
+        var copyright = game.add.image(game.width - 15, game.height - 20, 'copyright');
+        copyright.anchor.set(1, 1);
+        copyright.scale.set(0.55);
+
         var group = game.add.group();
         group.fixedToCamera = true;
         group.addMultiple([
             title,
             this.content,
-            btnGroup.group
+            btnGroup.group,
+            copyright
         ]);
         this.group = group;
+
+        this.updateShare();
 
         this.show();
     };
 
     proto.initContent = function () {
+    };
+
+    proto.updateShare = function () {
     };
 
     proto.show = function () {

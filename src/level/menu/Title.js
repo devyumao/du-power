@@ -39,9 +39,9 @@ define(function (require) {
     proto.init = function () {
         var game = this.game;
 
-        var wordart = game.add.image(game.width / 2, 86, 'title');
+        var wordart = game.add.image(game.width / 2, 90, 'title');
         wordart.anchor.set(0.5);
-        wordart.scale.set(0.5);
+        wordart.scale.set(0.6);
         this.wordart = wordart;
 
         var decoration = game.add.image(0, -18, 'title-decoration');

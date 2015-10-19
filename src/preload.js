@@ -23,22 +23,37 @@ define(function (require) {
      */
     state.initLoading = function () {
         var game = this.game;
+        var offset = 0;
 
-        var hero = game.add.sprite(game.width / 2, game.height / 2, 'hero-sleep');
+        if (this.scale.isPortrait) {
+            var inst = game.add.text(
+                game.width / 2, 120,
+                '屏幕横过来才好玩哟',
+                {
+                    font: 'bold 46px ' + global.fontFamily,
+                    fill: color.get('white')
+                }
+            );
+            inst.anchor.set(0.5);
+
+            offset = 70;
+        }
+
+        var hero = game.add.sprite(game.width / 2, 220 + offset, 'hero-sleep');
         hero.anchor.set(0.5);
         var action = 'sleep';
         hero.animations.add(action);
         hero.animations.play(action, 5, true);
 
-        var text = game.add.text(
-            game.width / 2, 340,
+        var loadingText = game.add.text(
+            game.width / 2, 330 + offset,
             'SSGer 启动中...',
             {
                 font: 'bold 30px ' + global.fontFamily,
                 fill: color.get('electric')
             }
         );
-        text.anchor.set(0.5);
+        loadingText.anchor.set(0.5);
     };
 
     /**
@@ -62,12 +77,13 @@ define(function (require) {
             'icon-back', 'icon-share', 'icon-restart',
             'success-title', 'ticket',
             'failure-title', 'progress-ring',
+            'copyright',
             'hero-label',
             'button-pause', 'button-close', 'button-back', 'button-restart',
             'charge', 'charge-double',
             'light-fly',
-            'gesture', 'arrow-charge', 'arrow-current',
-            'baidu'
+            'baidu',
+            'gesture', 'arrow-charge', 'arrow-current'
         ].forEach(function (name) {
             game.load.image(name, path + name + suffix);
         });
@@ -97,12 +113,12 @@ define(function (require) {
         [
             'bgm',
             'click',
-            'wake', 'fly', 'yell',
+            'wake', 'fly', 'yell', 'dive',
             'charge', 'charge-double',
             'finish', 'fall',
             'alarm'
         ].forEach(function (name) {
-            game.load.audio(name, [global.audioPath + name + '.mp3', global.audioPath + name + '.ogg']);
+            game.load.audio(name, [global.audioPath + name + '.ogg', global.audioPath + name + '.mp3']);
         });
     };
 
@@ -116,7 +132,7 @@ define(function (require) {
         game.sound.setDecodedCallback(
             [bgm],
             function () {
-                // bgm.loopFull();
+                bgm.loopFull();
             },
             this
         );

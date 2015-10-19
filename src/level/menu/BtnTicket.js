@@ -8,7 +8,7 @@ define(function (require) {
     var util = require('common/util');
     var color = require('common/color');
     var Mask = require('common/ui/Mask');
-    var Ticket = require('level/End/Ticket');
+    var Ticket = require('level/end/Ticket');
 
     /**
      * 奖券按钮类

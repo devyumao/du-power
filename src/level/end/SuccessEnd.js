@@ -5,6 +5,7 @@
 
 define(function (require) {
 
+    var global = require('common/global');
     var util = require('common/util');
     var End = require('./End');
     var Ticket = require('./Ticket');
@@ -33,6 +34,10 @@ define(function (require) {
     proto.initContent = function () {
         var ticket = new Ticket(this.game);
         this.content.add(ticket.element);
+    };
+
+    proto.updateShare = function () {
+        global.setShareText('【SSG运动会】我完成了挑战，你也来试试吧！');
     };
 
     return SuccessEnd;

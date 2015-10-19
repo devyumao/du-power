@@ -53,6 +53,10 @@ define(function (require) {
         this.content.add(ring);
     };
 
+    proto.updateShare = function () {
+        global.setShareText('【SSG运动会】我完成了' + Math.floor(this.progress * 100) + '%，你也来试试吧！');
+    };
+
     return FailureEnd;
 
 });

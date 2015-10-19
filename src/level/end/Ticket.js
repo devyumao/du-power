@@ -50,7 +50,7 @@ define(function (require) {
             .then(function (res) {
                 res = JSON.parse(res);
                 var codeText = res.success
-                    ? res.code.substring(1).split('').join(' ')
+                    ? (res.code + '').split('').join(' ')
                     : '奖券已领完';
 
                 var code = game.add.text(

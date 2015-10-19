@@ -47,6 +47,10 @@ define(function (require) {
 
         this.hasReachedMinVel = false;
 
+        this.isDiving = false;
+
+        this.soundDive = null;
+
         this.init();
     }
 
@@ -157,6 +161,10 @@ define(function (require) {
     proto.pauseAct = function () {
         var currentAnim = this.sprite.animations.currentAnim;
         currentAnim.stop();
+        if (this.isDiving) {
+            this.soundDive.stop();
+            this.isDiving = false;
+        }
     };
 
     proto.resumeAct = function () {
@@ -217,7 +225,7 @@ define(function (require) {
         var body = this.body;
         var velocity = body.velocity;
         if (velocity.x > MIN_VELOCITY_X) {
-            body.applyForce(0, 70); // TODO: 调参
+            body.applyForce(0, 75); // TODO: 调参
         }
         this.act('dive');
     };
@@ -335,17 +343,27 @@ define(function (require) {
                 var angle = body.angle;
                 if (level.isTouching) {
                     this.dive();
+
+                    if (!this.isDiving) {
+                        this.soundDive = level.sound.play('dive', 1, true);
+                        this.isDiving = true;
+                    }
                 }
                 else {
+                    if (this.isDiving) {
+                        this.soundDive.stop();
+                        this.isDiving = false;
+                    }
+
                     if (angle < 0) {
                         if (this.flyingFrameCount >= 12) {
                             var velocity = body.velocity;
                             if (!this.isFlying && velocity.y < 0) {
                                 var speed = Math.sqrt(Math.pow(velocity.x, 2) + Math.pow(velocity.y, 2));
-                                if (speed >= 500) {
+                                if (speed >= 550) {
                                     level.sound.play('fly');
                                     this.showLight();
-                                    speed >= 700 && level.time.events.add(
+                                    speed >= 800 && level.time.events.add(
                                         250,
                                         function () {
                                             level.sound.play('yell');

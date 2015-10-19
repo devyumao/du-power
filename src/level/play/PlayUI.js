@@ -51,27 +51,25 @@ define(function (require) {
         var game = this.game;
         var level = this.level;
 
+        var group = game.add.group();
+        group.fixedToCamera = true;
+        this.group = group;
+
         var alarm = new Alarm(game, {level: level});
         this.alarm = alarm;
+        group.add(alarm.element);
 
         var roadmap = new Roadmap(game, {level: level});
         this.roadmap = roadmap;
+        group.add(roadmap.element);
 
         var pause = new Pause(game, {level: level});
         this.pause = pause;
+        group.add(pause.group);
 
         var chargeTip = new ChargeTip(game, {level: level});
         this.chargeTip = chargeTip;
-
-        var group = game.add.group();
-        group.fixedToCamera = true;
-        group.addMultiple([
-            alarm.element,
-            roadmap.element,
-            pause.group,
-            chargeTip.group
-        ]);
-        this.group = group;
+        group.add(chargeTip.group);
     };
 
     proto.update = function () {

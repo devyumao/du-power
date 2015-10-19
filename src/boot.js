@@ -29,7 +29,7 @@ define(function (require) {
         scale.pageAlignHorizontally = true; // 水平居中
         scale.pageAlignVertically = true; // 垂直居中
         scale.scaleMode = Phaser.ScaleManager.SHOW_ALL;
-        scale.forceOrientation(true);
+        // scale.forceOrientation(true);
         // this.resize();
 
 

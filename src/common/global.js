@@ -30,22 +30,26 @@ define(function (require) {
         fontFamily: '"Helvetica Neue", Helvetica, STHeiTi, sans-serif',
 
         novice: null,
-        ticket: null
+        ticket: null,
+
+        shareText: null
     };
 
     global.init = function () {
-        this.initResourceConfig();
         this.initNovice();
         this.initTicket();
+        this.resetShareText();
     };
 
     // ==================== mode
     global.setDevMode = function () {
         this.mode = MODE.DEV;
+        this.initResourceConfig();
     };
 
     global.setProdMode = function () {
         this.mode = MODE.PROD;
+        this.initResourceConfig();
     };
 
     global.isDevMode = function () {
@@ -59,9 +63,10 @@ define(function (require) {
     // ==================== resource
     global.initResourceConfig = function () {
         if (this.isProdMode()) {
-            // global.imgPath = 'http://ishowshao-game.qiniudn.com/du-power/asset/img/';
+            // this.imgPath = 'http://ishowshao-game.qiniudn.com/du-power/asset/img/';
             this.imgPath = 'asset/img/';
-            this.imgSuffix = '.png?v=*TIMESTAMP*';
+            // this.imgSuffix = '.png?v=*TIMESTAMP*';
+            this.imgSuffix = '.png';
 
             this.audioPath = 'asset/audio/';
         }
@@ -126,6 +131,16 @@ define(function (require) {
         datasource.save({
             ticket: ticket
         });
+    };
+
+    // ==================== 奖券
+    global.resetShareText = function () {
+        this.shareText = '【SSG运动会】Fighting SSGer!';
+    };
+
+    global.setShareText = function (text) {
+        this.shareText = text;
+        global.isProdMode() && require('common/weixin').updateShare();
     };
 
     global.init();

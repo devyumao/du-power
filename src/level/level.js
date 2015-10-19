@@ -457,37 +457,37 @@ define(function (require) {
     };
 
     level.render = function () {
-        var game = this.game;
+        // var game = this.game;
 
-        game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
+        // game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
 
-        switch (this.status) {
-            case STATUS.MENU:
-                break;
+        // switch (this.status) {
+        //     case STATUS.MENU:
+        //         break;
 
-            case STATUS.PLAY:
-                var debugColor = 'rgba(255, 0, 0, 0.6)';
+        //     case STATUS.PLAY:
+        //         var debugColor = 'rgba(255, 0, 0, 0.6)';
 
-                // game.debug.box2dWorld();
-                // game.debug.geom(this.ceiling, debugColor);
-                // game.debug.geom(this.floor, debugColor);
+        //         // game.debug.box2dWorld();
+        //         // game.debug.geom(this.ceiling, debugColor);
+        //         // game.debug.geom(this.floor, debugColor);
 
-                game.context.fillStyle = debugColor;
+        //         game.context.fillStyle = debugColor;
 
-                this.hero.render();
+        //         this.hero.render();
 
-                game.debug.text(
-                    'progress: ' + (this.progress * 100).toFixed(0) + '%',
-                    2, 74,
-                    '#fff'
-                );
+        //         game.debug.text(
+        //             'progress: ' + (this.progress * 100).toFixed(0) + '%',
+        //             2, 74,
+        //             '#fff'
+        //         );
 
-                game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
+        //         game.debug.text('camera_x: ' + (game.camera.x / this.zoom.scale.x).toFixed(2), 2, 94, '#fff');
 
-                this.power.render();
+        //         this.power.render();
 
-                break;
-        }
+        //         break;
+        // }
     };
 
     // level.shutdown = function () {

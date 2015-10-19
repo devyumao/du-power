@@ -24,6 +24,7 @@ define(function (require) {
 
         wx.ready(function () {
             updateShare();
+            // wx.hideOptionMenu();
         });
     }
 
@@ -32,21 +33,18 @@ define(function (require) {
      */
     function updateShare() {
         var link = 'http://farm.yiluwan.org/dupower/index.php';
-        var imgUrl = 'http://farm.yiluwan.org/efe-game/asset/img/icon-200.png';
-        var title = 'Fighting SSGer';
+        var imgUrl = 'http://farm.yiluwan.org/dupower/asset/img/icon-200.png';
 
         wx.onMenuShareTimeline({
-            // title: global.getShareText(),
-            title: title,
+            title: global.shareText,
             link: link,
             imgUrl: imgUrl,
             success: function () {
             }
         });
         wx.onMenuShareAppMessage({
-            title: title,
-            // desc: global.getShareText(),
-            desc: title,
+            title: 'Fighting SSGer',
+            desc: global.shareText,
             link: link,
             imgUrl: imgUrl
         });

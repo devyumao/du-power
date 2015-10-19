@@ -41,11 +41,11 @@ define(function (require) {
         // this.value = 150;
         // this.lossFreq = 0.5;
 
-        this.normalCharge = 0.5;
-        this.normalThreshold = game.world.height - 450;
+        this.normalCharge = 0.6;
+        this.normalThreshold = game.world.height - 440;
 
-        this.superCharge = 1;
-        this.superThreshold = game.world.height - 580;
+        this.superCharge = 1.2;
+        this.superThreshold = game.world.height - 590;
 
         this.status = STATUS.LOSING;
 

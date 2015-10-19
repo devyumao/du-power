@@ -8,7 +8,7 @@ define(function (require) {
     var color = require('common/color');
     var util = require('common/util');
 
-    var NUM_EXTREMUM = 20; // 偶数为佳
+    var NUM_EXTREMUM = 110; // 偶数为佳
     var SEGMENT_WIDTH = 10;
     var SPRITE_INDEX = {
         tube: 0,
@@ -44,6 +44,8 @@ define(function (require) {
         this.tubes = [];
 
         this.currents = [];
+
+        this.logos = [];
 
         this.flag = null;
 
@@ -123,10 +125,10 @@ define(function (require) {
         //     y: worldHeight - 240
         // };
 
-        var minDX = 190;
+        var minDX = 200;
         var minDY = 80;
-        var rangeDX = 130;
-        var rangeDY = 120;
+        var rangeDX = 120;
+        var rangeDY = 110;
         var minHeight = 30;
         var maxHeight = 360;
 
@@ -163,7 +165,7 @@ define(function (require) {
         this.updateEdges();
         this.updateCurrents();
         this.updateFlag();
-        // this.updateLogos();
+        this.updateLogos();
     };
 
     proto.updateFlag = function () {
@@ -207,6 +209,7 @@ define(function (require) {
         var edges = this.edges;
         var currents = this.currents;
         var tubes = this.tubes;
+        var logos = this.logos;
         var zoom = this.level.zoom;
 
         var removeEdge = function (edge) {
@@ -228,6 +231,12 @@ define(function (require) {
                 tube.key.destroy();
                 tube.destroy();
                 tube[prevI] = null;
+
+                var logo = logos[prevI];
+                if (logo) {
+                    logo.destroy();
+                    logos[prevI] = null;
+                }
 
                 this.prevExtremumIndex = prevI;
 
@@ -382,26 +391,30 @@ define(function (require) {
     };
 
     proto.updateLogos = function () {
-        var game = this.game;
         var extremums = this.extremums;
-        var spriteGroup = this.spriteGroup;
+        var logos = this.logos;
 
         for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
-            if ((extInd === 3 || (extInd % 2 && util.proba(0.25)))
-                && extInd !== NUM_EXTREMUM - 1) {
+            var ext = extremums[extInd];
 
-                var childGroup = spriteGroup.getAt(extInd);
-                if (childGroup === -1) {
-                    break;
-                }
+            if (typeof logos[extInd] !== 'undefined') {
+                continue;
+            }
 
-                var sprite = childGroup.getAt(SPRITE_INDEX.logo);
-                if (sprite === -1) {
-                    var ext = extremums[extInd];
-                    console.log(ext);
-                }
+            if ((extInd - 3) % 10 === 0 && extInd !== NUM_EXTREMUM - 1) {
+                this.addLogo(extInd, ext);
             }
         }
+    };
+
+    proto.addLogo = function (extInd, ext) {
+        var game = this.game;
+
+        var sprite = game.add.image(ext.x, this.game.world.height - 30, 'baidu');
+        sprite.anchor.set(0.5, 1);
+        sprite.scale.set(0.7);
+        this.logos[extInd] = sprite;
+        this.level.zoom.add(sprite);
     };
 
     proto.drawCurrents = function (sprite, points) {
