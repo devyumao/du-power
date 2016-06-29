@@ -10,6 +10,9 @@ define(function (require) {
      *
      * @class
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
+     * @param {Object} options.x 水平位置
+     * @param {Object} options.x 竖直位置
      */
     function Flag(game, options) {
         /**
@@ -19,14 +22,39 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 精灵图
+         *
+         * @type {?Phaser.Sprite}
+         */
         this.sprite = null;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
+        /**
+         * 水平位置
+         *
+         * @type {number}
+         */
         this.x = options.x;
 
+        /**
+         * 竖直位置
+         *
+         * @type {number}
+         */
         this.y = options.y;
 
+        /**
+         * 动画名称
+         *
+         * @type {string}
+         */
         this.animName = 'flutter';
 
         this.init();
@@ -44,6 +72,11 @@ define(function (require) {
         this.initGroup();
     };
 
+    /**
+     * 初始化精灵图
+     *
+     * @private
+     */
     proto.initSprite = function () {
         var game = this.game;
 
@@ -58,17 +91,32 @@ define(function (require) {
         animations.play(animName, 6, true);
     };
 
+    /**
+     * 初始化组
+     *
+     * @private
+     */
     proto.initGroup = function () {
         var group = this.game.add.group();
         group.addMultiple([this.sprite]);
         this.group = group;
     };
 
+    /**
+     * 暂停动画
+     *
+     * @public
+     */
     proto.pauseAnim = function () {
         var currentAnim = this.sprite.animations.currentAnim;
         currentAnim.stop();
     };
 
+    /**
+     * 恢复动画
+     *
+     * @public
+     */
     proto.resumeAnim = function () {
         var currentAnim = this.sprite.animations.currentAnim;
         currentAnim.play();

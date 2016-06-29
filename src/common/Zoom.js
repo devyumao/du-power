@@ -7,9 +7,21 @@ define(function (require) {
 
     var util = require('common/util');
 
+    /**
+     * 变焦器
+     *
+     * @class
+     * @extends Phaser.Group
+     * @param {Phaser.Game} game 游戏
+     */
     function Zoom(game) {
         Phaser.Group.call(this, game);
 
+        /**
+         * 范围
+         *
+         * @type {Phaser.Rectangle}
+         */
         this.bounds = Phaser.Rectangle.clone(game.world.bounds);
 
         this.scale.setTo(1);
@@ -18,6 +30,13 @@ define(function (require) {
 
     var proto = Zoom.prototype;
 
+    /**
+     * 缩放至
+     *
+     * @public
+     * @param {number} scale 缩放比例
+     * @param {number} duration 用时
+     */
     proto.to = function (scale, duration) {
         var game = this.game;
         var bounds = this.bounds;
@@ -43,7 +62,6 @@ define(function (require) {
                 .start();
         }
     };
-
 
     return Zoom;
 

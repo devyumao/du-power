@@ -1,5 +1,5 @@
 /**
- * @file 可玩界面
+ * @file 游玩界面
  * @author yumao [zhangyu38@baidu.com]
  */
 
@@ -11,11 +11,12 @@ define(function (require) {
     var ChargeTip = require('./ChargeTip');
 
     /**
-     * 可玩界面类
+     * 游玩界面类
      *
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function PlayUI(game, options) {
         /**
@@ -25,16 +26,46 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
+        /**
+         * 警报
+         *
+         * @type {?Alarm}
+         */
         this.alarm = null;
 
+        /**
+         * 路程图
+         *
+         * @type {?Alarm}
+         */
         this.roadmap = null;
 
+        /**
+         * 暂停
+         *
+         * @type {?Pause}
+         */
         this.pause = null;
 
+        /**
+         * 充电提示
+         *
+         * @type {?chargeTip}
+         */
         this.chargeTip = null;
 
         this.init();
@@ -72,12 +103,22 @@ define(function (require) {
         group.add(chargeTip.group);
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         this.alarm.update();
         this.roadmap.update();
         this.chargeTip.update();
     };
 
+    /**
+     * 销毁
+     *
+     * @public
+     */
     proto.destroy = function () {
         var alarm = this.alarm;
         alarm.isAlarming && alarm.recover();

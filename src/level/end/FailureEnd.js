@@ -14,7 +14,10 @@ define(function (require) {
      * 失败结束类
      *
      * @class
+     * @extends End
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
+     * @param {number} options.progress 进程
      */
     function FailureEnd(game, options) {
         End.call(
@@ -24,6 +27,11 @@ define(function (require) {
             }
         );
 
+        /**
+         * 进程
+         *
+         * @type {number}
+         */
         this.progress = options.progress;
 
         this.init();
@@ -33,6 +41,11 @@ define(function (require) {
 
     var proto = FailureEnd.prototype;
 
+    /**
+     * 初始化内容
+     *
+     * @private
+     */
     proto.initContent = function () {
         var game = this.game;
 
@@ -53,6 +66,11 @@ define(function (require) {
         this.content.add(ring);
     };
 
+    /**
+     * 更新分享内容
+     *
+     * @public
+     */
     proto.updateShare = function () {
         global.setShareText('【SSG运动会】我完成了' + Math.floor(this.progress * 100) + '%，你也来试试吧！');
     };

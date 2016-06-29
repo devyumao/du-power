@@ -11,6 +11,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Roadmap(game, options) {
         /**
@@ -20,10 +21,25 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 定位贴图
+         *
+         * @type {?Phaser.Image}
+         */
         this.location = null;
 
+        /**
+         * 元素
+         *
+         * @type {?Phaser.Image}
+         */
         this.element = null;
 
         this.init();
@@ -47,6 +63,11 @@ define(function (require) {
         this.element = location;
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         this.location.x = this.level.progress * this.game.width;
     };

@@ -13,6 +13,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {string=} options.color 颜色
      * @param {number=} options.alpha 透明度
      * @param {Function=} options.onTouch 触摸回调
      */
@@ -31,6 +32,11 @@ define(function (require) {
          */
         this.image = null;
 
+        /**
+         * 颜色
+         *
+         * @type {string}
+         */
         this.color = options.color || color.get('mask');
 
         /**
@@ -135,6 +141,11 @@ define(function (require) {
         // TODO: 点击一次 remove
     };
 
+    /**
+     * 解除绑定触摸事件
+     *
+     * @public
+     */
     Mask.prototype.unbindTouch = function () {
         this.image.events.onInputUp.removeAll();
     };

@@ -22,8 +22,18 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 游戏
+         *
+         * @type {?Phaser.Image}
+         */
         this.image = null;
 
+        /**
+         * 元素
+         *
+         * @type {?Phaser.Image}
+         */
         this.element = null;
 
         this.init();
@@ -64,7 +74,6 @@ define(function (require) {
                 code.anchor.set(0.5, 0);
                 ticket.addChild(code);
 
-                // XXX: 过了时间 传个 false 给我
                 if (res.success && !global.getTicket()) {
                     global.setTicket(true);
                 }
@@ -72,6 +81,11 @@ define(function (require) {
 
     };
 
+    /**
+     * 销毁
+     *
+     * @public
+     */
     proto.destroy = function () {
         this.element.destroy();
     };

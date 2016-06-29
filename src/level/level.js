@@ -6,30 +6,42 @@
 define(function (require) {
 
     var global = require('common/global');
-    // var color = require('common/color');
     var util = require('common/util');
 
-    // var Mask = require('common/ui/Mask');
     var Zoom = require('common/Zoom');
 
+    var Background = require('./scene/Background');
+
+    // 引入菜单元素类
     var Menu = require('./menu/Menu');
     var Tutorial = require('./tutorial/Tutorial');
     var PlayUI = require('./play/PlayUI');
     var SuccessEnd = require('./end/SuccessEnd');
     var FailureEnd = require('./end/FailureEnd');
 
-    var Background = require('./scene/Background');
-
+    // 引入主体玩物类
     var Terrain = require('./Terrain');
     var Hero = require('./Hero');
     var Power = require('./Power');
 
+    /**
+     * 关卡内部状态列表
+     *
+     * @const
+     * @type {Object}
+     */
     var STATUS = {
-        MENU: 0,
-        PLAY: 1,
-        OVER: 2
+        MENU: 0, // 菜单
+        PLAY: 1, // 在玩
+        OVER: 2  // 结束
     };
 
+    /**
+     * 关卡 state
+     *
+     * @exports level
+     * @namespace
+     */
     var level = {
         STATUS: STATUS
     };
@@ -37,41 +49,42 @@ define(function (require) {
     /**
      * 初始化
      *
-     * @param {string} status 状态
+     * @param {number} status 状态
      */
     level.init = function (status) {
         this.reset();
 
         this.status = status;
-        // this.status = STATUS.PLAY; // for dev
     };
 
+    /**
+     * 重置
+     */
     level.reset = function () {
         util.extend(this, {
-            background: null,
-            midground: null,
-            lightground: null,
+            background: null, // 背景
+            midground: null, // 中景
+            lightground: null, // 光景 (光球层)
 
-            terrain: null,
-            hero: null,
-            zoom: null,
-            power: null,
+            terrain: null, // 地面
+            hero: null, // 英雄
+            zoom: null, // 变焦器
+            power: null, // 能量
 
-            menuUI: null,
-            playUI: null,
-            tutorial: null,
-            successEnd: null,
-            failureEnd: null,
+            menuUI: null, // 菜单界面
+            playUI: null, // 游玩界面
+            tutorial: null, // 教程
+            successEnd: null, // 成功结束面板
+            failureEnd: null, // 失败结束面板
 
-            status: null,
+            status: null, // 内部状态
 
-            isTouching: false,
-            isPaused: false,
-            hasUpdated: false,
+            isTouching: false, // 是否正在触摸
+            isPaused: false, // 是否暂停
 
-            progress: 0,
+            progress: 0, // 进程
 
-            lastCameraX: 0
+            lastCameraX: 0 // 上一帧的摄像机水平位置
         });
     };
 
@@ -79,6 +92,8 @@ define(function (require) {
      * 预加载
      */
     level.preload = function () {
+        // 开启包括 FPS 侦测在内的高级分析功能
+        // 注意: 上线前关闭改功能以保证性能
         this.time.advancedTiming = true;
     };
 
@@ -96,11 +111,6 @@ define(function (require) {
                 this.initPlayStatus();
                 break;
         }
-
-        // var mask = new Mask(this.game, {color: color.get('black'), alpha: 1});
-        // mask.hide(150); // 会自动销毁
-
-        // for dev
     };
 
     /**
@@ -109,7 +119,7 @@ define(function (require) {
     level.initMenuStatus = function () {
         this.initBaseObjects();
 
-        // this.pause();
+        // 暂停物理引擎
         this.physics.box2d.pause();
 
         var game = this.game;
@@ -117,9 +127,10 @@ define(function (require) {
     };
 
     /**
-     * 初始化可玩状态
+     * 初始化游玩状态
      */
     level.initPlayStatus = function () {
+        // 根据前继状态进行物件的销毁和初始化
         switch (this.status) {
             case STATUS.MENU:
                 this.menuUI.destroy();
@@ -129,28 +140,17 @@ define(function (require) {
             case STATUS.PLAY:
                 this.initBaseObjects();
                 break;
-
         }
 
-        // for dev
-        // var world = this.world;
-        // this.ceiling = new Phaser.Rectangle(0, 0, world.width, 40);
-        // this.floor = new Phaser.Rectangle(0, world.height - 40, world.width, world.height);
-
-        // var me = this;
-        // setTimeout(
-        //     function () {
-        //     },
-        //     0 // for dev
-        // );
-
+        // 恢复物理引擎
         this.physics.box2d.resume();
 
+        // 唤醒英雄
         this.hero.wake();
 
         this.bindTouch();
         this.playUI = new PlayUI(this.game, {level: this});
-        this.lightground.show(1000);
+        this.lightground.show(1000); // 光景渐显
     };
 
     /**
@@ -208,18 +208,18 @@ define(function (require) {
     };
 
     /**
-     * 初始化物理
+     * 初始化物理引擎
      */
     level.initPhysics = function () {
         var physics = this.physics;
         physics.startSystem(Phaser.Physics.BOX2D);
 
         var box2d = physics.box2d;
-        // box2d.ptmRatio = 60;
-        box2d.density = 1;
-        box2d.friction = 0.03;
-        box2d.restitution = 0.08;
-        box2d.gravity.y = 300;
+        // box2d.ptmRatio = 60; // for dev
+        box2d.density = 1; // 密度
+        box2d.friction = 0.03; // 摩擦系数
+        box2d.restitution = 0.08; // 恢复系数
+        box2d.gravity.y = 300; // 竖直重力
     };
 
     /**
@@ -229,8 +229,7 @@ define(function (require) {
         var zoom = new Zoom(this.game);
         zoom.addMultiple([
             this.hero.sprite
-            // TODO
-            // this.lightground.image
+            // TODO: 让 lightground 也能正常变焦, 增强视觉冲击
         ]);
         this.zoom = zoom;
     };
@@ -265,23 +264,35 @@ define(function (require) {
         this.isTouching = false;
     }
 
+    /**
+     * 暂停
+     */
     level.pause = function () {
         this.isPaused = true;
         this.physics.box2d.pause();
         this.pauseAnim();
     };
 
+    /**
+     * 暂停动画
+     */
     level.pauseAnim = function () {
         this.terrain.pauseAnim();
         this.hero.pauseAct();
     };
 
+    /**
+     * 恢复
+     */
     level.resume = function () {
         this.isPaused = false;
         this.physics.box2d.resume();
         this.resumeAnim();
     };
 
+    /**
+     * 恢复动画
+     */
     level.resumeAnim = function () {
         this.terrain.resumeAnim();
         this.hero.resumeAct();
@@ -294,9 +305,6 @@ define(function (require) {
         switch (this.status) {
             case STATUS.OVER:
             case STATUS.MENU:
-                // if (!this.hasUpdated) {
-                //     this.updateOnce();
-                // }
                 this.updateOnce();
                 this.updateView();
 
@@ -312,10 +320,11 @@ define(function (require) {
 
                 break;
         }
-
-        this.hasUpdated = true;
     };
 
+    /**
+     * 更新一次 (主体玩物)
+     */
     level.updateOnce = function () {
         this.updateCamera();
 
@@ -324,7 +333,9 @@ define(function (require) {
         this.hero.update();
     };
 
-    // FIX: 单独文件
+    /**
+     * 更新摄像机
+     */
     level.updateCamera = function () {
         var game = this.game;
         var hero = this.hero;
@@ -333,20 +344,26 @@ define(function (require) {
         var zoom = this.zoom;
         var world = this.world;
 
+        // 不活动区
         var deadzone = {
             x: 100, y: 100 * zoom.scale.y
         };
 
+        // 计算缩放倍数
         var fullHeight = world.height - heroSprite.y + deadzone.y;
         var scale = game.height < fullHeight ? game.height / fullHeight : 1;
 
         zoom.to(scale);
 
+        // 更新摄像机位置
         var deltaWG = world.height - game.height;
         camera.y = heroSprite.y - deadzone.y > deltaWG ? deltaWG : heroSprite.y - deadzone.y;
         camera.x = heroSprite.x * scale - deadzone.x;
     };
 
+    /**
+     * 更新场景
+     */
     level.updateView = function () {
         this.background.update();
         this.midground.update();
@@ -354,9 +371,13 @@ define(function (require) {
         this.lastCameraX = this.game.camera.x / this.zoom.scale.x;
     };
 
+    /**
+     * 更新游玩状态
+     */
     level.updatePlay = function () {
         var hero = this.hero;
 
+        // 是新手 and 已达到最低速度, 则暂停并开启教程
         if (global.getNovice() && hero.hasReachedMinVel) {
             var game = this.game;
             game.time.events.add(
@@ -374,10 +395,12 @@ define(function (require) {
         var terrain = this.terrain;
         var heroX = hero.getX();
 
+        // 更新进程
         this.progress = heroX < terrain.distance ? heroX / terrain.distance : 1;
 
         this.playUI.update();
 
+        // 进程 100% and 英雄休眠 and 关卡还没结束
         if (this.progress === 1 && !hero.isAwake() && !this.isOver()) {
             this.finish(); // 完成
             return;
@@ -387,7 +410,8 @@ define(function (require) {
         var POWER_STATUS = power.STATUS;
 
         switch (power.status) {
-            case POWER_STATUS.EMPTY:
+            case POWER_STATUS.EMPTY: // 能量用尽
+                // 英雄休眠 and 关卡还没结束
                 if (!hero.isAwake() && !this.isOver()) {
                     this.fail(); // 失败
                 }
@@ -395,10 +419,18 @@ define(function (require) {
         }
     };
 
+    /**
+     * 判断关卡是否结束
+     *
+     * @return {boolean} 是否结束
+     */
     level.isOver = function () {
         return this.status === STATUS.OVER;
     };
 
+    /**
+     * 成功完成
+     */
     level.finish = function () {
         this.complete();
         this.sound.play('finish');
@@ -406,6 +438,7 @@ define(function (require) {
         var me = this;
         var hero = this.hero;
 
+        // 英雄前往终点 -> 英雄结束 -> 弹出成功结束面板
         hero.goToTerminal(this.terrain)
             .then(function () {
                 hero.over();
@@ -420,6 +453,9 @@ define(function (require) {
             });
     };
 
+    /**
+     * 失败完成
+     */
     level.fail = function () {
         this.complete();
         this.sound.play('fall');
@@ -427,6 +463,7 @@ define(function (require) {
         var me = this;
         var hero = this.hero;
 
+        // 英雄坠落 -> 英雄结束 -> 弹出失败结束面板
         hero.fall(this.terrain)
             .then(function () {
                 hero.over();
@@ -441,25 +478,29 @@ define(function (require) {
             });
     };
 
+    /**
+     * 完成
+     */
     level.complete = function () {
         this.status = STATUS.OVER;
         this.physics.box2d.pause();
-
-        // var zoom = this.zoom;
-        // if (zoom.scale.x !== 1) {
-        //     var duration = 200;
-        //     zoom.to(1, duration);
-        // }
 
         this.playUI.destroy();
 
         this.lightground.hide(500);
     };
 
+    /**
+     * 渲染帧
+     * 屏幕上 log 出参数, 供调试使用
+     * 注意：上线前关闭
+     */
     level.render = function () {
-        // var game = this.game;
+        var game = this.game;
 
-        // game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
+        game.debug.text('FPS: ' + (game.time.fps || '--'), 2, 14, '#00ff00');
+
+        game.debug.box2dWorld();
 
         // switch (this.status) {
         //     case STATUS.MENU:
@@ -468,9 +509,9 @@ define(function (require) {
         //     case STATUS.PLAY:
         //         var debugColor = 'rgba(255, 0, 0, 0.6)';
 
-        //         // game.debug.box2dWorld();
-        //         // game.debug.geom(this.ceiling, debugColor);
-        //         // game.debug.geom(this.floor, debugColor);
+        //         game.debug.box2dWorld();
+        //         game.debug.geom(this.ceiling, debugColor);
+        //         game.debug.geom(this.floor, debugColor);
 
         //         game.context.fillStyle = debugColor;
 
@@ -489,9 +530,6 @@ define(function (require) {
         //         break;
         // }
     };
-
-    // level.shutdown = function () {
-    // };
 
     return level;
 

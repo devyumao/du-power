@@ -17,6 +17,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Menu(game, options) {
         /**
@@ -26,17 +27,26 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 遮罩
+         *
+         * @type {?Mask}
+         */
         this.mask = null;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
-
-        // this.start = null;
-
-        // this.title = null;
-
-        // this.btnTicket = null;
 
         this.init();
     }
@@ -68,6 +78,11 @@ define(function (require) {
         }
     };
 
+    /**
+     * 销毁
+     *
+     * @public
+     */
     proto.destroy = function () {
         this.group.destroy();
         this.mask.hide(600);

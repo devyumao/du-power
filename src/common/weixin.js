@@ -24,6 +24,7 @@ define(function (require) {
 
         wx.ready(function () {
             updateShare();
+            // 活动期间禁用分享功能
             // wx.hideOptionMenu();
         });
     }

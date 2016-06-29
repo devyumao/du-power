@@ -13,6 +13,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Alarm(game, options) {
         /**
@@ -22,16 +23,46 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 贴图
+         *
+         * @type {?Phaser.Image}
+         */
         this.image = null;
 
+        /**
+         * 元素
+         *
+         * @type {?Phaser.Image}
+         */
         this.element = null;
 
+        /**
+         * 是否正在报警
+         *
+         * @type {boolean}
+         */
         this.isAlarming = false;
 
+        /**
+         * 补间动画
+         *
+         * @type {Phaser.Tween}
+         */
         this.tween = null;
 
+        /**
+         * 声效
+         *
+         * @type {Phaser.Sound}
+         */
         this.audio = null;
 
         this.init();
@@ -58,6 +89,11 @@ define(function (require) {
         this.element = image;
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         var power = this.level.power;
 
@@ -69,12 +105,18 @@ define(function (require) {
         }
     };
 
+    /**
+     * 报警
+     *
+     * @public
+     */
     proto.alarm = function () {
         var game = this.game;
         var image = this.image;
 
         image.visible = 1;
 
+        // 图层闪烁
         this.tween = game.add.tween(this.image)
             .from({alpha: 0}, 500, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true)
             .start();
@@ -82,6 +124,11 @@ define(function (require) {
         this.isAlarming = true;
     };
 
+    /**
+     * 恢复
+     *
+     * @public
+     */
     proto.recover = function () {
         var image = this.image;
         image.visible = false;

@@ -14,24 +14,50 @@ define(function (require) {
      *
      * @class
      * @param {Phaser.Game} game 游戏
+     * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Pause(game, options) {
         /**
          * 游戏
          *
          * @type {Phaser.Game}
-         * @param {Object} options 参数项
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 触发器
+         *
+         * @type {?Phaser.Button}
+         */
         this.trigger = null;
 
+        /**
+         * 菜单
+         *
+         * @type {?Phaser.Group}
+         */
         this.menu = null;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
+        /**
+         * 是否收起
+         *
+         * @type {boolean}
+         */
         this.isCollapsed = true;
 
         this.init();
@@ -50,6 +76,11 @@ define(function (require) {
         this.initGroup();
     };
 
+    /**
+     * 初始化触发器
+     *
+     * @private
+     */
     proto.initTrigger = function () {
         var game = this.game;
 
@@ -82,6 +113,11 @@ define(function (require) {
         this.trigger = trigger;
     };
 
+    /**
+     * 初始化菜单
+     *
+     * @private
+     */
     proto.initMenu = function () {
         var game = this.game;
 
@@ -101,6 +137,7 @@ define(function (require) {
 
         var btnConfigList = [
             {
+                // 返回主菜单
                 name: 'button-back',
                 onClick: function () {
                     game.sound.play('click');
@@ -111,6 +148,7 @@ define(function (require) {
                 }
             },
             {
+                // 重新开始
                 name: 'button-restart',
                 onClick: function () {
                     game.sound.play('click');
@@ -135,6 +173,11 @@ define(function (require) {
         });
     };
 
+    /**
+     * 初始化组
+     *
+     * @private
+     */
     proto.initGroup = function () {
         var group = this.game.add.group();
         group.addMultiple([this.trigger, this.menu]);

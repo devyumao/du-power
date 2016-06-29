@@ -8,13 +8,20 @@ define(function (require) {
     var color = require('common/color');
     var util = require('common/util');
 
+    /**
+     * 极值点数量
+     *
+     * @const
+     * @type {number}
+     */
     var NUM_EXTREMUM = 110; // 偶数为佳
+    /**
+     * 区间宽度
+     *
+     * @const
+     * @type {number}
+     */
     var SEGMENT_WIDTH = 10;
-    var SPRITE_INDEX = {
-        tube: 0,
-        current: 1,
-        logo: 2
-    };
 
     /**
      * 地面类
@@ -22,6 +29,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Terrain(game, options) {
         /**
@@ -31,35 +39,116 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 极值点集
+         *
+         * @type {Array.<Object>}
+         */
         this.extremums = [];
 
+        /**
+         * Box2D 躯体
+         *
+         * @type {Phaser.Physics.Box2D.Body}
+         */
         this.body = null;
 
-        this.edges = []; // FIX: 重命名为曲线
+        /**
+         * 边缘曲线列表
+         *
+         * @type {Array.<Array>}
+         */
+        this.edges = []; // FIXME: 重命名为曲线
 
+        /**
+         * 边缘点集
+         *
+         * @type {Array.<Array>}
+         */
         this.edgePoints = [];
 
+        /**
+         * 管道精灵图列表
+         *
+         * @type {Array.<Phaser.Sprite>}
+         */
         this.tubes = [];
 
+        /**
+         * 电流精灵图列表
+         *
+         * @type {Array.<Phaser.Sprite>}
+         */
         this.currents = [];
 
+        /**
+         * BAIUD logo 贴图列表
+         *
+         * @type {Array.<Phaser.Image>}
+         */
         this.logos = [];
 
+        /**
+         * 终点旗子
+         *
+         * @type {?Phaser.Sprite}
+         */
         this.flag = null;
 
+        /**
+         * 是否有旗子
+         *
+         * @type {boolean}
+         */
         this.hasFlag = false;
 
+        /**
+         * 前极值点序号
+         *
+         * @type {number}
+         */
         this.prevExtremumIndex = 0;
+
+        /**
+         * 后极值点序号
+         *
+         * @type {number}
+         */
         this.nextExtremumIndex = 0;
 
+        /**
+         * 电流颜色
+         *
+         * @type {string}
+         */
         this.currentColor = color.get('electric');
 
+        /**
+         * 电流透明度
+         *
+         * @type {number}
+         */
         this.cAlpha = 1;
 
+        /**
+         * 电流增量符号 控制闪烁效果
+         *
+         * @type {number}
+         */
         this.cAlphaDeltaSign = -1;
 
+        /**
+         * 路程全长
+         *
+         * @type {?number}
+         */
         this.distance = null;
 
         this.init();
@@ -75,23 +164,10 @@ define(function (require) {
     proto.init = function () {
         this.initExtremums();
         this.initBody();
-        // this.initFlag();
-    };
-
-    proto.initFlag = function () {
-        var Flag = require('./scene/Flag');
-        var game = this.game;
-        var penult = this.extremums[NUM_EXTREMUM - 2];
-
-        this.flag = new Flag(
-            game,
-            {x: game.world.width - 70, y: penult.y}
-        );
-        this.hasFlag = true;
     };
 
     /**
-     * 初始化主体
+     * 初始化物理主体
      *
      * @private
      */
@@ -99,7 +175,7 @@ define(function (require) {
         var game = this.game;
 
         var body = new Phaser.Physics.Box2D.Body(game, null, 0, 0);
-        body.static = true;
+        body.static = true; // 位置静止
         this.body = body;
     };
 
@@ -115,15 +191,10 @@ define(function (require) {
         // 前三点
         var extremums = [
             {x: -60, y: worldHeight - 80},
-            {x: 100, y: worldHeight - 160}, // TODO: config
+            {x: 100, y: worldHeight - 160},
             {x: 320, y: worldHeight - 40},
             {x: 600, y: worldHeight - 200}
         ];
-
-        // extremums[0] = {
-        //     x: 0,
-        //     y: worldHeight - 240
-        // };
 
         var minDX = 200;
         var minDY = 80;
@@ -154,13 +225,17 @@ define(function (require) {
         extremums.push({x: penult.x + 500, y: penult.y});
 
         this.extremums = extremums;
-        // TODO: 路程去前
-        this.distance = penult.x;
+        this.distance = penult.x; // 全长为倒二点水平位置
 
+        // 根据最远极值点设定世界宽度
         game.world.width = extremums[NUM_EXTREMUM - 1].x;
-        // game.world.setBounds(0, 0, extremums[NUM_EXTREMUM - 1].x, worldHeight);
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         this.updateEdges();
         this.updateCurrents();
@@ -168,6 +243,11 @@ define(function (require) {
         this.updateLogos();
     };
 
+    /**
+     * 更新旗子
+     *
+     * @private
+     */
     proto.updateFlag = function () {
         if (this.hasFlag) {
             return;
@@ -175,33 +255,82 @@ define(function (require) {
 
         var game = this.game;
         var boundsLeft = this.getPenult().x - 600;
+        // 快抵达终点时更新旗子
         if (game.camera.x / this.level.zoom.scale.x > boundsLeft) {
             this.initFlag();
         }
     };
 
+    /**
+     * 初始化旗子
+     *
+     * @private
+     */
+    proto.initFlag = function () {
+        var Flag = require('./scene/Flag');
+        var game = this.game;
+        var penult = this.extremums[NUM_EXTREMUM - 2];
+
+        this.flag = new Flag(
+            game,
+            {x: game.world.width - 70, y: penult.y}
+        );
+        this.hasFlag = true;
+    };
+
+    /**
+     * 暂停动画
+     *
+     * @public
+     */
     proto.pauseAnim = function () {
         this.hasFlag && this.flag.pauseAnim();
     };
 
+    /**
+     * 暂停动画
+     *
+     * @public
+     */
     proto.resumeAnim = function () {
         this.hasFlag && this.flag.resumeAnim();
     };
 
+    /**
+     * 取得倒数第二个极值点
+     *
+     * @private
+     * @return {Object} 极值点
+     */
     proto.getPenult = function () {
         return this.extremums[NUM_EXTREMUM - 2];
     };
 
+    /**
+     * 更新边缘曲线
+     *
+     * @private
+     */
     proto.updateEdges = function () {
         this.clearPrevEdges();
         this.drawNextEdges();
     };
 
+    /**
+     * 更新电流
+     *
+     * @private
+     */
     proto.updateCurrents = function () {
         this.updateCurrentColor();
         this.renderCurrents();
     };
 
+    /**
+     * 清除前一组边缘 (连带附属)
+     *
+     * @private
+     */
     proto.clearPrevEdges = function () {
         var game = this.game;
         var body = this.body;
@@ -219,19 +348,23 @@ define(function (require) {
         for (var prevI = this.nextExtremumIndex; prevI > this.prevExtremumIndex; --prevI) {
             var boundsLeft = game.camera.x / zoom.scale.x - 400;
             if (extremums[prevI].x < boundsLeft) {
+                // 清除边缘
                 edges[prevI].forEach(removeEdge);
                 edges[prevI] = null;
 
+                // 清除电流
                 var current = currents[prevI];
                 current.key.destroy();
                 current.destroy();
                 currents[prevI] = null;
 
+                // 清除管道
                 var tube = tubes[prevI];
                 tube.key.destroy();
                 tube.destroy();
                 tube[prevI] = null;
 
+                // 清除 logo
                 var logo = logos[prevI];
                 if (logo) {
                     logo.destroy();
@@ -245,6 +378,11 @@ define(function (require) {
         }
     };
 
+    /**
+     * 绘制后一组边缘
+     *
+     * @private
+     */
     proto.drawNextEdges = function () {
         var game = this.game;
         var body = this.body;
@@ -255,6 +393,7 @@ define(function (require) {
         var zoom = this.level.zoom;
         var tubes = this.tubes;
 
+        // 变相余弦曲线
         for (var i = this.nextExtremumIndex; i < NUM_EXTREMUM - 1; ++i) {
             var pointA = extremums[i];
             var boundsRight = game.camera.x / zoom.scale.x + 2000;
@@ -270,7 +409,6 @@ define(function (require) {
             var ymid = (pointA.y + pointB.y) / 2;
             var ampl = (pointA.y - pointB.y) / 2;
 
-            // var p0 = Phaser.Utils.extend(pointA);
             var p0 = {x: pointA.x, y: pointA.y};
             var edgeGroup = [];
 
@@ -278,17 +416,17 @@ define(function (require) {
             var sprite = game.add.sprite(pointA.x, 0, bitmap);
             sprite.terrainType = 'tube'; // for test
             tubes[i] = sprite;
-            zoom.add(sprite);
+            zoom.add(sprite); // 管道贴图加入变焦器
 
             var points = [p0];
 
             var ctx = bitmap.ctx;
             ctx.beginPath();
-            // ctx.lineJoin = 'miter';
             ctx.lineCap = 'round';
             ctx.lineWidth = 2;
             ctx.strokeStyle = color.get('electric');
 
+            // 区间逐点连线
             for (var j = 1; j < segmentCount + 1; ++j) {
                 var p1 = {
                     x: pointA.x + j * dx,
@@ -300,7 +438,7 @@ define(function (require) {
 
                 var p0xRel = p0.x - sprite.x;
                 var p1xRel = p1.x - sprite.x;
-
+                // 上边缘
                 ctx.moveTo(p0xRel, p0.y);
                 ctx.lineTo(p1xRel, p1.y);
 
@@ -311,6 +449,7 @@ define(function (require) {
                 // TODO: 解决不连续
                 var iy = tubeWidth * cos;
                 var ix = -tubeWidth * sin;
+                // 下边缘
                 ctx.moveTo(p0xRel + ix, p0.y + iy);
                 ctx.lineTo(p1xRel + ix, p1.y + iy);
 
@@ -329,11 +468,15 @@ define(function (require) {
         }
     };
 
+    /**
+     * 更新电流颜色
+     *
+     * @private
+     */
     proto.updateCurrentColor = function () {
         var power = this.level.power;
         var POWER_STATUS = power.STATUS;
 
-        // TODO: 充电闪烁效果
         switch (power.status) {
             case POWER_STATUS.STABLE:
             case POWER_STATUS.LOSING:
@@ -350,6 +493,11 @@ define(function (require) {
         }
     };
 
+    /**
+     * 渲染电流
+     *
+     * @private
+     */
     proto.renderCurrents = function () {
         var game = this.game;
         var extremums = this.extremums;
@@ -359,6 +507,7 @@ define(function (require) {
         var power = level.power;
         var currents = this.currents;
 
+        // 在透明度 0.5 至 1 内往复
         if (this.cAlpha >= 1) {
             this.cAlphaDeltaSign = -1;
         }
@@ -367,11 +516,10 @@ define(function (require) {
         }
         this.cAlpha += this.cAlphaDeltaSign * 0.02;
 
+        // 绘制电流
         for (var extInd = this.prevExtremumIndex; extInd < this.nextExtremumIndex; ++extInd) {
             var pointA = extremums[extInd];
-            // if (pointA.x + SEGMENT_WIDTH <= game.camera.x / zoom.scale.x) {
-            //     continue;
-            // }
+            // 电流反映电量
             if (pointA.x > game.camera.x / zoom.scale.x + power.value) {
                 break;
             }
@@ -384,39 +532,19 @@ define(function (require) {
                 sprite = game.add.sprite(pointA.x, 0, bitmap);
                 sprite.terrainType = 'current'; // for test
                 currents[extInd] = sprite;
-                zoom.add(sprite);
+                zoom.add(sprite); // 贴图加入变焦器
             }
             this.drawCurrents(sprite, edgePoints[extInd]);
         }
     };
 
-    proto.updateLogos = function () {
-        var extremums = this.extremums;
-        var logos = this.logos;
-
-        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
-            var ext = extremums[extInd];
-
-            if (typeof logos[extInd] !== 'undefined') {
-                continue;
-            }
-
-            if ((extInd - 3) % 10 === 0 && extInd !== NUM_EXTREMUM - 1) {
-                this.addLogo(extInd, ext);
-            }
-        }
-    };
-
-    proto.addLogo = function (extInd, ext) {
-        var game = this.game;
-
-        var sprite = game.add.image(ext.x, this.game.world.height - 30, 'baidu');
-        sprite.anchor.set(0.5, 1);
-        sprite.scale.set(0.7);
-        this.logos[extInd] = sprite;
-        this.level.zoom.add(sprite);
-    };
-
+    /**
+     * 渲染电流
+     *
+     * @private
+     * @param {Phaser.Sprite} sprite 精灵图
+     * @param {Array.<Object>} points 点集
+     */
     proto.drawCurrents = function (sprite, points) {
         var game = this.game;
         var currentWidth = 6;
@@ -456,6 +584,53 @@ define(function (require) {
         ctx.closePath();
     };
 
+    /**
+     * 更新 logo
+     *
+     * @private
+     */
+    proto.updateLogos = function () {
+        var extremums = this.extremums;
+        var logos = this.logos;
+
+        for (var extInd = this.prevExtremumIndex; extInd <= this.nextExtremumIndex; ++extInd) {
+            var ext = extremums[extInd];
+
+            if (typeof logos[extInd] !== 'undefined') {
+                continue;
+            }
+
+            // 3 个极值点以后, 每 10 个点出现一次 logo
+            // 并且最末点不出现
+            if ((extInd - 3) % 10 === 0 && extInd !== NUM_EXTREMUM - 1) {
+                this.addLogo(extInd, ext);
+            }
+        }
+    };
+
+    /**
+     * 添加 logo
+     *
+     * @private
+     * @param {number} extInd 极值点索引
+     * @param {Object} ext 极值点
+     */
+    proto.addLogo = function (extInd, ext) {
+        var game = this.game;
+
+        var sprite = game.add.image(ext.x, this.game.world.height - 30, 'baidu');
+        sprite.anchor.set(0.5, 1);
+        sprite.scale.set(0.7);
+        this.logos[extInd] = sprite;
+        this.level.zoom.add(sprite);
+    };
+
+    /**
+     * 取得终点位置
+     *
+     * @public
+     * @return {Object} 终点位置
+     */
     proto.getTerminal = function () {
         var lastPoint = this.extremums[NUM_EXTREMUM - 1];
 
@@ -465,6 +640,13 @@ define(function (require) {
         };
     };
 
+    /**
+     * 取得最近坠落点
+     *
+     * @public
+     * @param {Hero} hero 主角
+     * @return {?Object} 最近坠落点位置
+     */
     proto.getNearestPoint = function (hero) {
         var edgePoints = this.edgePoints;
         var heroX = hero.body.x;

@@ -5,12 +5,18 @@
 
 define(function (require) {
 
+    /**
+     * 能量状态集
+     *
+     * @const
+     * @type {Object}
+     */
     var STATUS = {
-        EMPTY: 0,
-        STABLE: 1,
-        LOSING: 2,
-        NORMAL_CHARGE: 3,
-        SUPER_CHARGE: 4
+        EMPTY: 0, // 耗尽
+        STABLE: 1, // 稳定
+        LOSING: 2, // 耗损
+        NORMAL_CHARGE: 3, // 正常充电
+        SUPER_CHARGE: 4 // 超级充电
     };
 
     /**
@@ -19,6 +25,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Power(game, options) {
         /**
@@ -28,38 +35,100 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 最大值
+         *
+         * @type {number}
+         */
         this.max = game.width;
+
+        /**
+         * 最小值
+         *
+         * @type {number}
+         */
         this.min = 0;
 
+        /**
+         * 当前值
+         *
+         * @type {number}
+         */
         this.value = this.max;
 
+        /**
+         * 每帧耗损值
+         *
+         * @type {number}
+         */
         this.lossFreq = 0.5;
 
-        // for dev
-        // this.value = 150;
-        // this.lossFreq = 0.5;
-
+        /**
+         * 每帧正常充电值
+         *
+         * @type {number}
+         */
         this.normalCharge = 0.6;
+
+        /**
+         * 正常充电的高度阈值
+         *
+         * @type {number}
+         */
         this.normalThreshold = game.world.height - 440;
 
+        /**
+         * 每帧超级充电值
+         *
+         * @type {number}
+         */
         this.superCharge = 1.2;
+
+        /**
+         * 超级充电的高度阈值
+         *
+         * @type {number}
+         */
         this.superThreshold = game.world.height - 590;
 
+        /**
+         * 电量状态
+         *
+         * @type {number}
+         */
         this.status = STATUS.LOSING;
 
+        /**
+         * 上一帧状态
+         *
+         * @type {number}
+         */
         this.lastStatus = this.status;
 
+        /**
+         * 低电量阈值
+         *
+         * @type {number}
+         */
         this.lowThreshold = 150;
-
-        // this.init();
     }
 
     var proto = Power.prototype;
 
     proto.STATUS = STATUS;
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         var level = this.level;
         var hero = level.hero;
@@ -98,10 +167,19 @@ define(function (require) {
         }
     };
 
+    /**
+     * 判断是否低电量
+     *
+     * @public
+     * @return {boolean} 是否低电量
+     */
     proto.isLow = function () {
         return this.value < this.lowThreshold;
     };
 
+    /**
+     * 渲染帧 用于调试
+     */
     proto.render = function () {
         var game = this.game;
 

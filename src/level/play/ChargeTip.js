@@ -11,6 +11,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function ChargeTip(game, options) {
         /**
@@ -20,8 +21,18 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
         this.init();
@@ -38,11 +49,21 @@ define(function (require) {
         this.initGroup();
     };
 
+    /**
+     * 初始化组
+     *
+     * @private
+     */
     proto.initGroup = function () {
         this.group = this.game.add.group();
-        // this.addTip('charge');
     };
 
+    /**
+     * 添加提示
+     *
+     * @private
+     * @param {string} name 提示贴图名
+     */
     proto.addTip = function (name) {
         var game = this.game;
         var group = this.group;
@@ -77,6 +98,11 @@ define(function (require) {
         flyIn.start();
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     proto.update = function () {
         var level = this.level;
         var sound = level.sound;

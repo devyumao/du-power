@@ -11,7 +11,11 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      * @param {string} options.imageName 贴图名
+     * @param {string} options.absSpeed 绝对速度, 缺省 0
+     * @param {string} options.relSpeed 相对速度, 缺省 0
+     * @param {string} options.alpha 透明度, 缺省 1
      */
     function Background(game, options) {
         /**
@@ -21,6 +25,11 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
         /**
@@ -37,10 +46,25 @@ define(function (require) {
          */
         this.imageName = options.imageName;
 
+        /**
+         * 绝对速度
+         *
+         * @type {number}
+         */
         this.absSpeed = options.absSpeed || 0;
 
+        /**
+         * 相对速度
+         *
+         * @type {number}
+         */
         this.relSpeed = options.relSpeed || 0;
 
+        /**
+         * 透明度
+         *
+         * @type {number}
+         */
         this.alpha = options.alpha !== 'undefined' ? options.alpha : 1;
 
         this.init();
@@ -66,9 +90,15 @@ define(function (require) {
         image.anchor.set(0, 1);
         image.fixedToCamera = true;
         this.image = image;
-        // image.tilePosition.x -= config.THEME[this.index].OFFSET;
     };
 
+    /**
+     * 显示
+     *
+     * @public
+     * @param {number} duration 用时
+     * @return {Promise}
+     */
     Background.prototype.show = function (duration) {
         if (duration) {
             var show = this.game.add.tween(this.image)
@@ -86,6 +116,13 @@ define(function (require) {
         return Promise.resolve();
     };
 
+    /**
+     * 隐藏
+     *
+     * @public
+     * @param {number} duration 用时
+     * @return {Promise}
+     */
     Background.prototype.hide = function (duration) {
         if (duration) {
             var show = this.game.add.tween(this.image)
@@ -103,6 +140,11 @@ define(function (require) {
         return Promise.resolve();
     };
 
+    /**
+     * 更新帧
+     *
+     * @public
+     */
     Background.prototype.update = function () {
         var level = this.level;
 
@@ -122,6 +164,11 @@ define(function (require) {
         this.image.tilePosition.x -= offsetX;
     };
 
+    /**
+     * 销毁
+     *
+     * @public
+     */
     Background.prototype.destroy = function () {
         this.image.destroy();
     };

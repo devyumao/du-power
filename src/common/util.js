@@ -93,6 +93,11 @@ define(function (require) {
         });
     };
 
+    /**
+     * 取得窗口大小
+     *
+     * @return {Object} 大小
+     */
     util.getWindowSize = function () {
         return {
             width: window.innerWidth

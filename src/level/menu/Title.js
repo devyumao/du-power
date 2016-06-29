@@ -20,10 +20,25 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 艺术字
+         *
+         * @type {Phaser.Image}
+         */
         this.wordart = null;
 
+        /**
+         * 文字装饰
+         *
+         * @type {Phaser.Image}
+         */
         this.decoration = null;
 
+        /**
+         * 元素
+         *
+         * @type {Phaser.Image}
+         */
         this.element = null;
 
         this.init();
@@ -54,6 +69,11 @@ define(function (require) {
         this.animate();
     };
 
+    /**
+     * 动画
+     *
+     * @private
+     */
     proto.animate = function () {
         this.game.add.tween(this.decoration.scale)
             .to({x: 1.08, y: 1.08}, 500, Phaser.Easing.Sinusoidal.InOut, true, 0, -1, true);

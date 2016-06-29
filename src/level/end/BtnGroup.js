@@ -24,6 +24,11 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
         this.init();
@@ -56,6 +61,7 @@ define(function (require) {
         // TODO: 素材留白 保证点击
         var btnConfigList = [
             {
+                // 返回主菜单
                 name: 'icon-back',
                 scale: 0.7,
                 onClick: function () {
@@ -67,6 +73,7 @@ define(function (require) {
                 }
             },
             {
+                // 分享 暂无作用
                 name: 'icon-share',
                 scale: 0.7,
                 onClick: function () {
@@ -74,6 +81,7 @@ define(function (require) {
                 }
             },
             {
+                // 重新开始
                 name: 'icon-restart',
                 scale: 0.7,
                 onClick: function () {

@@ -1,5 +1,5 @@
 /**
- * @file 教学
+ * @file 教程
  * @author yumao [zhangyu38@baidu.com]
  */
 
@@ -10,11 +10,12 @@ define(function (require) {
     var Mask = require('common/ui/Mask');
 
     /**
-     * 可玩界面类
+     * 教程类
      *
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} options.level 所属关卡
      */
     function Tutorial(game, options) {
         /**
@@ -24,10 +25,25 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 所属关卡
+         *
+         * @type {Object}
+         */
         this.level = options.level;
 
+        /**
+         * 遮罩
+         *
+         * @type {?Mask}
+         */
         this.mask = null;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
         this.init();
@@ -50,6 +66,11 @@ define(function (require) {
         this.show();
     };
 
+    /**
+     * 初始化遮罩
+     *
+     * @private
+     */
     proto.initMask = function () {
         var me = this;
 
@@ -66,12 +87,22 @@ define(function (require) {
         this.mask = mask;
     };
 
+    /**
+     * 初始化组
+     *
+     * @private
+     */
     proto.initGroup = function () {
         var group = this.game.add.group();
         group.fixedToCamera = true;
         this.group = group;
     };
 
+    /**
+     * 初始化手势
+     *
+     * @private
+     */
     proto.initGesture = function () {
         var game = this.game;
 
@@ -91,6 +122,11 @@ define(function (require) {
         gesture.addChild(inst);
     };
 
+    /**
+     * 初始化电流说明
+     *
+     * @private
+     */
     proto.initCurrentInst = function () {
         var game = this.game;
 
@@ -112,6 +148,11 @@ define(function (require) {
         inst.addChild(arrow);
     };
 
+    /**
+     * 初始化充电说明
+     *
+     * @private
+     */
     proto.initChargeInst = function () {
         var game = this.game;
 
@@ -131,6 +172,11 @@ define(function (require) {
         inst.addChild(arrow);
     };
 
+    /**
+     * 显示
+     *
+     * @private
+     */
     proto.show = function () {
         this.mask.show(200);
 
@@ -139,6 +185,11 @@ define(function (require) {
             .start();
     };
 
+    /**
+     * 销毁
+     *
+     * @private
+     */
     proto.destroy = function () {
         this.mask.hide(200);
 

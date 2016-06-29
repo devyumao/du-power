@@ -24,12 +24,32 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 按钮
+         *
+         * @type {?Phaser.Button}
+         */
         this.button = null;
 
+        /**
+         * 遮罩
+         *
+         * @type {?Mask}
+         */
         this.mask = null;
 
+        /**
+         * 奖券
+         *
+         * @type {?Ticket}
+         */
         this.ticket = null;
 
+        /**
+         * 元素
+         *
+         * @type {?Phaser.Button}
+         */
         this.element = null;
 
         this.init();
@@ -59,6 +79,11 @@ define(function (require) {
         this.element = button;
     };
 
+    /**
+     * 响应点击事件
+     *
+     * @private
+     */
     proto.onClick = function () {
         var game = this.game;
         game.sound.play('click');
@@ -87,6 +112,12 @@ define(function (require) {
             .start();
     };
 
+
+    /**
+     * 隐藏奖券
+     *
+     * @private
+     */
     proto.hideTicket = function () {
         this.mask.hide(500);
 

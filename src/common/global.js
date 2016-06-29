@@ -12,11 +12,11 @@ define(function (require) {
         PROD: 1
     };
 
-    var storagePrefix = 'dupower-';
-    var storageKey = {
-        novice: storagePrefix + 'novice',
-        ticket: storagePrefix + 'ticket'
-    };
+    // var storagePrefix = 'dupower-';
+    // var storageKey = {
+    //     novice: storagePrefix + 'novice',
+    //     ticket: storagePrefix + 'ticket'
+    // };
 
     var global = {
         mode: MODE.DEV,
@@ -89,8 +89,7 @@ define(function (require) {
 
     // ==================== 新手
     global.initNovice = function () {
-        var novice = localStorage.getItem(storageKey.novice);
-        this.novice = novice !== null ? JSON.parse(novice) : true;
+        this.novice = true;
     };
 
     global.getNovice = function () {
@@ -99,14 +98,10 @@ define(function (require) {
 
     global.setNovice = function (novice) {
         this.novice = novice;
-        localStorage.setItem(storageKey.novice, novice);
     };
 
     // ==================== 奖券
     global.initTicket = function () {
-        // var ticket = localStorage.getItem(storageKey.ticket);
-        // this.ticket = ticket !== null ? JSON.parse(ticket) : false;
-
         var me = this;
         datasource.load(
             ['ticket'],
@@ -126,7 +121,6 @@ define(function (require) {
 
     global.setTicket = function (ticket) {
         this.ticket = ticket;
-        // localStorage.setItem(storageKey.ticket, ticket);
 
         datasource.save({
             ticket: ticket

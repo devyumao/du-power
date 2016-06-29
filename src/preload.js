@@ -8,6 +8,12 @@ define(function (require) {
     var global = require('common/global');
     var color = require('common/color');
 
+    /**
+     * 预加载 state
+     *
+     * @exports state
+     * @namespace
+     */
     var state = {};
 
     /**
@@ -58,14 +64,15 @@ define(function (require) {
 
     /**
      * 加载资源
-     *
-     * @inner
      */
     state.loadResources = function () {
         this.loadAudios();
         this.loadImages();
     };
 
+    /**
+     * 载入图片
+     */
     state.loadImages = function () {
         var game = this.game;
         var path = global.imgPath;
@@ -107,6 +114,9 @@ define(function (require) {
         game.load.spritesheet('flag', path + 'flag' + suffix, 186, 197);
     };
 
+    /**
+     * 载入音频
+     */
     state.loadAudios = function () {
         var game = this.game;
 
@@ -129,6 +139,7 @@ define(function (require) {
         var game = this.game;
 
         var bgm = game.add.audio('bgm');
+        // 音频解码后循环播放背景乐
         game.sound.setDecodedCallback(
             [bgm],
             function () {

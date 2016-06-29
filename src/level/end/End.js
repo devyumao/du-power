@@ -15,6 +15,7 @@ define(function (require) {
      * @class
      * @param {Phaser.Game} game 游戏
      * @param {Object} options 参数项
+     * @param {Object} titleImageName 标题贴图名称
      */
     function End(game, options) {
         /**
@@ -24,12 +25,32 @@ define(function (require) {
          */
         this.game = game;
 
+        /**
+         * 标题贴图名称
+         *
+         * @type {string}
+         */
         this.titleImageName = options.titleImageName;
 
+        /**
+         * 遮罩
+         *
+         * @type {string}
+         */
         this.mask = null;
 
+        /**
+         * 组
+         *
+         * @type {?Phaser.Group}
+         */
         this.group = null;
 
+        /**
+         * 内容
+         *
+         * @type {?Phaser.Group}
+         */
         this.content = null;
     }
 
@@ -74,12 +95,29 @@ define(function (require) {
         this.show();
     };
 
+    /**
+     * 初始化内容
+     * 供继承类覆盖
+     *
+     * @private
+     */
     proto.initContent = function () {
     };
 
+    /**
+     * 更新分享内容
+     * 供继承类覆盖
+     *
+     * @public
+     */
     proto.updateShare = function () {
     };
 
+    /**
+     * 显示
+     *
+     * @private
+     */
     proto.show = function () {
         this.game.add.tween(this.group)
             .from({alpha: 0}, 500, Phaser.Easing.Quadratic.InOut)

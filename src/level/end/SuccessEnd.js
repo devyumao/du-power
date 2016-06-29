@@ -14,6 +14,7 @@ define(function (require) {
      * 成功结束类
      *
      * @class
+     * @extends End
      * @param {Phaser.Game} game 游戏
      */
     function SuccessEnd(game) {
@@ -31,11 +32,21 @@ define(function (require) {
 
     var proto = SuccessEnd.prototype;
 
+    /**
+     * 初始化内容
+     *
+     * @private
+     */
     proto.initContent = function () {
         var ticket = new Ticket(this.game);
         this.content.add(ticket.element);
     };
 
+    /**
+     * 更新分享内容
+     *
+     * @public
+     */
     proto.updateShare = function () {
         global.setShareText('【SSG运动会】我完成了挑战，你也来试试吧！');
     };
