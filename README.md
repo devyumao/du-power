@@ -1,6 +1,6 @@
 # 小度能量
 
-Demo: http://farm.yiluwan.org/dupower/index.php?debug=true
+Demo: http://devyumao.github.io/du-power/dist/
 
 ![qrcode](./screenshot/qrcode.jpg)
 
